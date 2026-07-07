@@ -10,7 +10,7 @@ export const AuthProvider = ({ children }) => {
   const [authCallback, setAuthCallback] = useState(null);
 
   const requireAuth = (callback) => {
-    if (token && user) {
+    if (token) {
       callback();
     } else {
       setAuthCallback(() => callback);
@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     if (token) {
       // Validate token and get user profile
-      fetch('http://localhost:55000/api/auth/me', {
+      fetch('http://localhost:55000/api/userSide/me', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -31,7 +31,20 @@ export const AuthProvider = ({ children }) => {
         throw new Error('Session expired');
       })
       .then(data => {
-        setUser(data);
+        if (data && data.success && data.user) {
+          const names = (data.user.user_name || '').split(' ');
+          const firstName = names[0] || '';
+          const lastName = names.slice(1).join(' ') || '';
+          setUser({
+            id: data.user._id,
+            firstName,
+            lastName,
+            email: data.user.email,
+            mobile: data.user.phone_number
+          });
+        } else {
+          throw new Error('Session expired');
+        }
       })
       .catch(() => {
         logout();
@@ -77,26 +90,31 @@ export const AuthProvider = ({ children }) => {
   };
 
   const updateProfile = async (fields) => {
-    const res = await fetch('http://localhost:55000/api/auth/profile', {
-      method: 'PUT',
+    const user_name = `${fields.firstName} ${fields.lastName}`.trim();
+    const res = await fetch('http://localhost:55000/api/userSide/userID', {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify(fields)
+      body: JSON.stringify({ userID: user_name })
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Profile update failed');
-    setUser(data);
-    return data;
+    if (!res.ok || !data.success) throw new Error(data.message || 'Profile update failed');
+    
+    const names = (data.user.user_name || '').split(' ');
+    const firstName = names[0] || '';
+    const lastName = names.slice(1).join(' ') || '';
+    const updatedUser = {
+      ...user,
+      firstName,
+      lastName
+    };
+    setUser(updatedUser);
+    return updatedUser;
   };
 
   const deleteAccount = async () => {
-    const res = await fetch('http://localhost:55000/api/auth/profile', {
-      method: 'DELETE',
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    if (!res.ok) throw new Error('Failed to delete account');
     logout();
   };
 

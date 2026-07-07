@@ -29,7 +29,7 @@ import giftsForMomImg from '../assets/gifts-for-mom.png';
 import { products } from '../data/products';
 
 export default function Header({ wishlist = {}, setWishlist, cart = {}, setCart }) {
-  const { user, logout } = useContext(AuthContext);
+  const { user, token, logout } = useContext(AuthContext);
   const { cartList } = useContext(CartContext);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [pincode, setPincode] = useState('');
@@ -95,7 +95,7 @@ export default function Header({ wishlist = {}, setWishlist, cart = {}, setCart 
       {/* Top Bar matching Candere style */}
       <div className="header-top-bar desktop-only-util">
         <div className="top-bar-left">
-          <a href="#orders" className="top-bar-link" onClick={(e) => { if (user) { window.location.hash = 'profile'; } else { e.preventDefault(); setShowAuthModal(true); } }}>
+          <a href="#orders" className="top-bar-link" onClick={(e) => { if (token || user) { window.location.hash = 'profile'; } else { e.preventDefault(); setShowAuthModal(true); } }}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="top-bar-icon">
               <rect x="1" y="3" width="15" height="13" rx="2" ry="2"></rect>
               <circle cx="16" cy="8" r="2"></circle>
@@ -206,7 +206,7 @@ export default function Header({ wishlist = {}, setWishlist, cart = {}, setCart 
                 className="action-link-icon nav-item-trigger"
                 aria-label="Profile"
                 onClick={(e) => {
-                  if (!user) {
+                  if (!token && !user) {
                     e.preventDefault();
                     setShowAuthModal(true);
                   }
@@ -218,9 +218,9 @@ export default function Header({ wishlist = {}, setWishlist, cart = {}, setCart 
                 </svg>
               </a>
               <div className="profile-dropdown" style={{ right: 0 }}>
-                {user ? (
+                {token || user ? (
                   <>
-                    <h4 style={{ textTransform: 'none' }}>Hello, {user.firstName}!</h4>
+                    <h4 style={{ textTransform: 'none' }}>Hello, {user ? user.firstName : 'Valued Customer'}!</h4>
                     <p className="profile-dropdown-subtitle">Manage profile, addresses & orders.</p>
                     <div className="profile-actions-stack" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                       <a href="#profile" className="profile-signup-btn" style={{ textAlign: 'center' }}>My Dashboard</a>

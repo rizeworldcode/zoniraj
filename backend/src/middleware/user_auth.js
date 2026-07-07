@@ -23,10 +23,10 @@ async function user_auth(req, res, next) {
     next();
   } catch (error) {
     console.log(error);
-    return {
-        message: error.message || "Internal server error",
+    return res.status(401).json({
+        message: error.message || "Invalid or expired token",
         success: false,
-      };
+      });
   }
 }
 
