@@ -2415,7 +2415,7 @@ button {
 
 .mega-dropdown-inner {
   display: grid;
-  grid-template-columns: repeat(4, 1fr) 2.2fr;
+  grid-template-columns: repeat(3, 1fr) 2.2fr;
   gap: 30px;
   max-width: 1200px;
   margin: 0 auto;
@@ -2531,10 +2531,11 @@ button {
 
 .mega-banner-card {
   position: relative;
-  border-radius: 6px;
+  border-radius: 8px;
   overflow: hidden;
-  height: 220px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+  height: 100%;
+  min-height: 220px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .mega-banner-card img {
