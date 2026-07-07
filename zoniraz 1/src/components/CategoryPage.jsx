@@ -17,6 +17,156 @@ export default function CategoryPage({ category, wishlist = {}, setWishlist, car
 
   const productTypes = categoryProductTypesMap[category] || [category];
 
+  // Dynamic products from backend database
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [queryParams, setQueryParams] = useState({});
+
+  useEffect(() => {
+    setLoading(true);
+    fetch('http://localhost:5000/api/admin/products')
+      .then(res => {
+        if (!res.ok) throw new Error('Network error');
+        return res.json();
+      })
+      .then(resData => {
+        if (resData.success && resData.data && resData.data.length > 0) {
+          const mapped = (resData.data || []).map(p => {
+            const id = p._id || p.product_id;
+            const name = p.product_title || p.name || 'Jewellery Item';
+            const price = Number(p.price) || Number(p.basePrice) || 0;
+            const discount = Number(p.discount) || 0;
+            
+            // Get category name
+            const category = p.product_category || p.category || 'Rings';
+            
+            // Get subcategory (style / tag fallback)
+            let subcategory = p.product_subcategory || p.productSubCategory || p.subcategory || '';
+            if (!subcategory && p.specs && p.specs.style) {
+              subcategory = p.specs.style;
+            }
+            if (!subcategory && p.tags && Array.isArray(p.tags)) {
+              const excludedTags = ['rings', 'ring', 'earrings', 'earring', 'pendants', 'pendant', 'necklaces', 'necklace', 'bracelets', 'bracelet', 'bangles', 'bangle', 'women', 'men', 'kids', 'diamond', 'gold', 'silver', 'platinum'];
+              const subTag = p.tags.find(t => !excludedTags.includes(t.toLowerCase()));
+              if (subTag) subcategory = subTag;
+            }
+
+            // Get gender
+            let genderList = [];
+            if (p.gender) genderList.push(p.gender);
+            if (p.specs && p.specs.gender) genderList.push(p.specs.gender);
+            if (p.tags && Array.isArray(p.tags)) {
+              if (p.tags.includes('women')) genderList.push('women');
+              if (p.tags.includes('men')) genderList.push('men');
+              if (p.tags.includes('kids')) genderList.push('kids');
+            }
+            const gender = [...new Set(genderList.map(s => s.toLowerCase()))].join(', ');
+
+            // Get images array
+            let images = [];
+            if (p.gallery) {
+              if (Array.isArray(p.gallery)) images = p.gallery;
+              else if (typeof p.gallery === 'string') images = p.gallery.split(',').map(s => s.trim());
+            } else if (p.images) {
+              if (Array.isArray(p.images)) images = p.images;
+              else if (typeof p.images === 'string') images = p.images.split(',').map(s => s.trim());
+            }
+            
+            const size = p.size_id || (p.specs && p.specs.size) || 'Free Size';
+
+            // Get material / stone / metal
+            let matList = [];
+            if (p.product_type) matList.push(p.product_type);
+            if (p.stoneType) matList.push(p.stoneType);
+            if (p.defaultMetal) matList.push(p.defaultMetal);
+            if (p.specs) {
+              if (p.specs.metal) matList.push(p.specs.metal);
+              if (p.specs.stoneType) matList.push(p.specs.stoneType);
+            }
+            if (p.tags && Array.isArray(p.tags)) {
+              if (p.tags.includes('diamond')) matList.push('diamond');
+              if (p.tags.includes('gold')) matList.push('gold');
+              if (p.tags.includes('platinum')) matList.push('platinum');
+              if (p.tags.includes('rose gold') || p.tags.includes('rose-gold')) matList.push('rose gold');
+              if (p.tags.includes('yellow gold') || p.tags.includes('yellow-gold')) matList.push('yellow gold');
+              if (p.tags.includes('white gold') || p.tags.includes('white-gold')) matList.push('white gold');
+            }
+            const material = [...new Set(matList.map(s => s.toLowerCase()))].join(', ');
+            const weight = p.product_weight || p.gold_weight || p.baseWeight || 0;
+            const fastDelivery = p.feature === '1';
+            const latest = p.sessional === '1';
+            const storePickup = p.topselling === '1';
+
+            return {
+              id,
+              productId: p.product_id || String(id),
+              name,
+              price,
+              originalPrice: price + discount,
+              images,
+              size,
+              material,
+              category,
+              weight,
+              fastDelivery,
+              latest,
+              storePickup,
+              tryAtHome: true,
+              subcategory,
+              gender
+            };
+          });
+          
+          const mapImgUrl = (url, name) => {
+            if (!url) return 'https://placehold.co/600x600?text=' + encodeURIComponent(name);
+            if (url.startsWith('http')) return url;
+            return `http://localhost:5000/uploads/${url}`;
+          };
+
+          const fullyMapped = mapped.map(item => {
+            const clientImages = item.images.map(url => mapImgUrl(url, item.name));
+            if (clientImages.length === 0) {
+              clientImages.push(mapImgUrl('', item.name));
+            }
+            return {
+              ...item,
+              image: clientImages[0],
+              images: clientImages
+            };
+          });
+
+          setProducts(fullyMapped);
+        } else {
+          setProducts(initialProducts);
+        }
+      })
+      .catch(err => {
+        console.error('Error fetching categories products, using fallback:', err);
+        setProducts(initialProducts);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const fullHash = window.location.hash.replace('#', '');
+      const [_, queryString] = fullHash.split('?');
+      const params = {};
+      if (queryString) {
+        const parts = queryString.split('&');
+        parts.forEach(part => {
+          const [k, v] = part.split('=');
+          if (k && v) params[k.toLowerCase()] = decodeURIComponent(v).toLowerCase();
+        });
+      }
+      console.log('CategoryPage HashChange Params:', params);
+      setQueryParams(params);
+    };
+
+    handleHashChange();
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
   // Filters State
   const [selectedSizes, setSelectedSizes] = useState([]);
   const [selectedPrices, setSelectedPrices] = useState([]);
@@ -63,7 +213,7 @@ export default function CategoryPage({ category, wishlist = {}, setWishlist, car
 
   // Reset filters on category change
   useEffect(() => {
-    clearAllFilters();
+    resetLocalFilters();
   }, [category]);
 
   const toggleAccordion = (key) => {
@@ -115,7 +265,7 @@ export default function CategoryPage({ category, wishlist = {}, setWishlist, car
     );
   };
 
-  const clearAllFilters = () => {
+  const resetLocalFilters = () => {
     setSelectedSizes([]);
     setSelectedPrices([]);
     setSelectedWeights([]);
@@ -123,6 +273,14 @@ export default function CategoryPage({ category, wishlist = {}, setWishlist, car
     setSelectedProductTypes([]);
     setDiscountOnly(false);
     setActiveCapsule('All');
+  };
+
+  const clearAllFilters = () => {
+    resetLocalFilters();
+    
+    // Clear URL query parameters
+    const categorySlug = category.toLowerCase().replace(/ /g, '-');
+    window.location.hash = '#' + categorySlug;
   };
 
   // Toggle wishlist
@@ -190,14 +348,67 @@ export default function CategoryPage({ category, wishlist = {}, setWishlist, car
   }, [callModalOpen]);
 
   // Apply filters and sorting
-  const filteredProducts = initialProducts.filter(product => {
-    // Filter by Category
-    if (product.category !== category) return false;
+  const filteredProducts = products.filter(product => {
+    // Filter by Category (case-insensitive, hyphen-insensitive, singular/plural safe)
+    if (product.category && category) {
+      const prodCatClean = String(product.category).toLowerCase().replace(/[^a-z0-9]/g, '');
+      const pageCatClean = String(category).toLowerCase().replace(/[^a-z0-9]/g, '');
+      let isMatch = (prodCatClean === pageCatClean);
+      if (!isMatch) {
+        if (prodCatClean.endsWith('s') && prodCatClean.slice(0, -1) === pageCatClean) isMatch = true;
+        if (pageCatClean.endsWith('s') && pageCatClean.slice(0, -1) === prodCatClean) isMatch = true;
+      }
+      if (!isMatch) return false;
+    } else {
+      return false;
+    }
+
+    // Filter by URL subcategory query param
+    const targetSubcategory = queryParams.subcategory || queryParams.style;
+    if (targetSubcategory) {
+      const sub = String(product.subcategory || '');
+      if (!sub) return false;
+      
+      const subSlug = sub.toLowerCase().replace(/ /g, '-').trim();
+      const targetSlug = String(targetSubcategory).trim();
+      const isMatch = (subSlug === targetSlug || subSlug.includes(targetSlug) || targetSlug.includes(subSlug));
+      console.log(`Subcategory Match Check: product=${product.name}, sub=${sub}, subSlug=${subSlug}, targetSlug=${targetSlug}, isMatch=${isMatch}`);
+      if (!isMatch) {
+        return false;
+      }
+    }
+
+    // Filter by URL gender query param
+    if (queryParams.gender) {
+      const gen = String(product.gender || '');
+      if (!gen.toLowerCase().includes(queryParams.gender)) return false;
+    }
+
+    // Filter by URL stone query param
+    if (queryParams.stone) {
+      const mat = String(product.material || '');
+      if (!mat.toLowerCase().includes(queryParams.stone)) return false;
+    }
+
+    // Filter by URL metal query param
+    if (queryParams.metal) {
+      const mat = String(product.material || '').toLowerCase().replace(/-/g, ' ');
+      const targetMetal = String(queryParams.metal).replace(/-/g, ' ');
+      if (!mat.includes(targetMetal)) return false;
+    }
+
+    // Filter by URL price range query params
+    if (queryParams.minprice) {
+      if (product.price < Number(queryParams.minprice)) return false;
+    }
+    if (queryParams.maxprice) {
+      if (product.price > Number(queryParams.maxprice)) return false;
+    }
 
     // Size Filter
     if (selectedSizes.length > 0 && !selectedSizes.includes(product.size)) return false;
 
-    // Price Filter
+    // Price Filter (Sidebar checkboxes)
     if (selectedPrices.length > 0) {
       const priceMatches = selectedPrices.some(range => {
         if (range === 'under-5000') return product.price < 10000;
@@ -226,9 +437,14 @@ export default function CategoryPage({ category, wishlist = {}, setWishlist, car
     
     // Product Type Filter (using Substring matching on product name)
     if (selectedProductTypes.length > 0) {
-      const matchesType = selectedProductTypes.some(type => 
-        product.name.toLowerCase().includes(type.toLowerCase())
-      );
+      const matchesType = selectedProductTypes.some(type => {
+        const nameLower = product.name.toLowerCase();
+        const typeLower = type.toLowerCase();
+        if (nameLower.includes(typeLower)) return true;
+        if (typeLower.endsWith('s') && nameLower.includes(typeLower.slice(0, -1))) return true;
+        if (nameLower.includes(typeLower + 's')) return true;
+        return false;
+      });
       if (!matchesType) return false;
     }
 
@@ -254,6 +470,20 @@ export default function CategoryPage({ category, wishlist = {}, setWishlist, car
 
   const totalActiveFilters = selectedSizes.length + selectedPrices.length + selectedWeights.length + selectedMaterials.length + selectedProductTypes.length + (discountOnly ? 1 : 0);
 
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', gap: '16px' }}>
+        <div style={{ width: '40px', height: '40px', border: '3px solid #f3e6de', borderTop: '3px solid #8e24aa', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+        <p style={{ color: '#8c7365', fontSize: '14px', fontWeight: '500' }}>Loading products...</p>
+        <style>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
+      </div>
+    );
+  }
   return (
     <div className="rings-page-wrapper">
       <style>{`
@@ -1082,7 +1312,7 @@ export default function CategoryPage({ category, wishlist = {}, setWishlist, car
                       />
                       <span>Size {size}</span>
                       <span className="checkbox-count">
-                        ({initialProducts.filter(p => p.category === category && p.size === size).length * 10})
+                        ({products.filter(p => String(p.category).toLowerCase().replace(/[^a-z0-9]/g, '') === String(category).toLowerCase().replace(/[^a-z0-9]/g, '') && Number(p.size) === Number(size)).length})
                       </span>
                     </label>
                   ))}
@@ -1276,9 +1506,11 @@ export default function CategoryPage({ category, wishlist = {}, setWishlist, car
                         <div className="price-row">
                           <span className="current-price">₹{product.price.toLocaleString('en-IN')}</span>
                           <span className="original-price">₹{product.originalPrice.toLocaleString('en-IN')}</span>
-                          <span className="discount-pct">
-                            ({Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF)
-                          </span>
+                          {product.originalPrice > product.price && (
+                            <span className="discount-pct">
+                              ({Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF)
+                            </span>
+                          )}
                         </div>
 
                         <button 

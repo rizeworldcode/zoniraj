@@ -27,7 +27,7 @@ const frequentlyBoughtItems = [
   }
 ];
 
-export default function CartPage({ cart = {}, setCart }) {
+export default function CartPage({ products: propProducts = [], cart = {}, setCart }) {
   const [couponCode, setCouponCode] = useState('');
   const [appliedDiscount, setAppliedDiscount] = useState(0);
   const [couponMessage, setCouponMessage] = useState('');
@@ -93,7 +93,7 @@ export default function CartPage({ cart = {}, setCart }) {
 
   cartItemIds.forEach(id => {
     // Find in products or FBT
-    let item = products.find(p => p.id.toString() === id);
+    let item = (propProducts && propProducts.length > 0 ? propProducts : products).find(p => p.id.toString() === id);
     if (!item) {
       item = frequentlyBoughtItems.find(f => f.id.toString() === id);
     }

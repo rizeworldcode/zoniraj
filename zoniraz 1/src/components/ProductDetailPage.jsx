@@ -14,6 +14,7 @@ const sizeOptions = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
 const metalOptions = ['14 KT Yellow', '14 KT Rose', '18 KT Yellow', '18 KT White', 'Platinum'];
 const diamondOptions = ['FG-SI', 'EF-VS', 'GH-SI', 'IJ-SI'];
 
+
 const sizeMmMap = {
   5: '44.8',
   6: '45.9',
@@ -32,7 +33,7 @@ const sizeMmMap = {
   19: '59.1'
 };
 
-export default function ProductDetailPage({ product, wishlist = {}, setWishlist, cart = {}, setCart, onBack }) {
+export default function ProductDetailPage({ product, products: propProducts = [], wishlist = {}, setWishlist, cart = {}, setCart, onBack }) {
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState(product?.size || 12);
   const [selectedMetal, setSelectedMetal] = useState('18 KT Yellow'); // Default 18 KT Yellow to match customization screen selected options
@@ -43,16 +44,16 @@ export default function ProductDetailPage({ product, wishlist = {}, setWishlist,
   const [stickyVisible, setStickyVisible] = useState(false);
   const [addedToCart, setAddedToCart] = useState(false);
 
-  const [customPrice, setCustomPrice] = useState(product.price);
-  const [customOriginalPrice, setCustomOriginalPrice] = useState(product.originalPrice);
+  const [customPrice, setCustomPrice] = useState(product?.price || 0);
+  const [customOriginalPrice, setCustomOriginalPrice] = useState(product?.originalPrice || 0);
   const [customiseOpen, setCustomiseOpen] = useState(false);
 
   useEffect(() => {
     // If it's product 2 (Infinity For Life), initialize to 70405 to match screen options
-    if (product.id === 2) {
+    if (product && product.id === 2) {
       setCustomPrice(70405);
       setCustomOriginalPrice(83482);
-    } else {
+    } else if (product) {
       setCustomPrice(product.price);
       setCustomOriginalPrice(product.originalPrice);
     }
@@ -71,7 +72,6 @@ export default function ProductDetailPage({ product, wishlist = {}, setWishlist,
       setTempSize(selectedSize);
     }
   }, [customiseOpen, selectedMetal, selectedDiamond, selectedSize]);
-
   // Try at Home Modal
   const [tryHomeOpen, setTryHomeOpen] = useState(false);
   const [tryForm, setTryForm] = useState({ name: '', phone: '', date: '' });
@@ -136,6 +136,7 @@ export default function ProductDetailPage({ product, wishlist = {}, setWishlist,
     setWishlist(prev => ({ ...prev, [product.id]: !prev[product.id] }));
   };
 
+
   const getModalEstimatedPrice = (metal, diamond) => {
     // If it's product 2 (Infinity For Life Diamond Ring) and selected options match the screenshot (18 KT Yellow Gold, FG-SI),
     // show exactly ₹70,405 (original ₹83,482).
@@ -172,6 +173,7 @@ export default function ProductDetailPage({ product, wishlist = {}, setWishlist,
     return { price: basePrice, originalPrice: baseOriginal };
   };
 
+
   const handlePincodeCheck = (e) => {
     e.preventDefault();
     if (pincode.length === 6) {
@@ -196,7 +198,9 @@ export default function ProductDetailPage({ product, wishlist = {}, setWishlist,
   };
 
   // Related products
-  const relatedProducts = products.filter(p => p.id !== product.id).slice(0, 4);
+  const relatedProducts = (propProducts && propProducts.length > 0 ? propProducts : products)
+    .filter(p => String(p.id) !== String(product.id))
+    .slice(0, 4);
 
   return (
     <div className="pdp-wrapper" ref={topRef}>
@@ -1120,6 +1124,7 @@ export default function ProductDetailPage({ product, wishlist = {}, setWishlist,
           to { transform: rotate(360deg); }
         }
 
+
         /* Customise Modal styling */
         .pdp-customise-modal-overlay {
           position: fixed;
@@ -1345,6 +1350,7 @@ export default function ProductDetailPage({ product, wishlist = {}, setWishlist,
           background: #523f34;
         }
 
+
         @media (max-width: 1000px) {
           .pdp-main-grid {
             grid-template-columns: 1fr;
@@ -1385,9 +1391,17 @@ export default function ProductDetailPage({ product, wishlist = {}, setWishlist,
       <div className="pdp-breadcrumb">
         <span onClick={() => { window.location.hash = ''; }}>Home</span>
         <span>›</span>
-        <span onClick={() => { window.location.hash = 'rings'; }}>Rings</span>
-        <span>›</span>
-        <span onClick={() => { window.location.hash = 'rings'; }}>Diamond Rings</span>
+        <span onClick={() => { window.location.hash = '#' + (product.category || 'rings').toLowerCase().replace(/ /g, '-'); }}>
+          {product.category || 'Rings'}
+        </span>
+        {product.subcategory && (
+          <>
+            <span>›</span>
+            <span onClick={() => { window.location.hash = '#' + (product.category || 'rings').toLowerCase().replace(/ /g, '-') + '?subcategory=' + product.subcategory.toLowerCase().replace(/ /g, '-'); }}>
+              {product.subcategory}
+            </span>
+          </>
+        )}
         <span>›</span>
         <span className="active">{product.name}</span>
       </div>
@@ -1857,6 +1871,7 @@ export default function ProductDetailPage({ product, wishlist = {}, setWishlist,
           </div>
         </div>
       )}
+
       {/* Customise Modal */}
       {customiseOpen && (
         <div className="pdp-customise-modal-overlay" onClick={() => setCustomiseOpen(false)}>
@@ -1978,6 +1993,7 @@ export default function ProductDetailPage({ product, wishlist = {}, setWishlist,
           </div>
         </div>
       )}
+
     </div>
   );
 }

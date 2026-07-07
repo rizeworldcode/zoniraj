@@ -40,6 +40,7 @@ export default function Header({ wishlist = {}, setWishlist, cart = {}, setCart 
   const [scrolled, setScrolled] = useState(false);
   const [disabledDropdown, setDisabledDropdown] = useState(null);
 
+
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 20) {
@@ -62,6 +63,17 @@ export default function Header({ wishlist = {}, setWishlist, cart = {}, setCart 
       {/* Top Bar matching Candere style */}
       <div className="header-top-bar desktop-only-util">
         <div className="top-bar-left">
+          <a href="#orders" className="top-bar-link" onClick={(e) => { if (user) { window.location.hash = 'profile'; } else { e.preventDefault(); setShowAuthModal(true); } }}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="top-bar-icon">
+              <rect x="1" y="3" width="15" height="13" rx="2" ry="2"></rect>
+              <circle cx="16" cy="8" r="2"></circle>
+              <circle cx="20" cy="8" r="2"></circle>
+              <line x1="6" y1="21" x2="6" y2="16"></line>
+              <line x1="10" y1="21" x2="10" y2="16"></line>
+            </svg>
+            ORDER TRACKING
+          </a>
+          <span className="divider-dot">•</span>
           <a href="#digital-gold" className="top-bar-link" onClick={(e) => { e.preventDefault(); setGoldModalOpen(true); setGoldActiveTab('menu'); }}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="top-bar-icon">
               <circle cx="12" cy="12" r="10"></circle>
@@ -159,7 +171,7 @@ export default function Header({ wishlist = {}, setWishlist, cart = {}, setCart 
             <div className="nav-item-container nav-profile-wrapper">
               <a 
                 href="#profile" 
-                className="action-link-icon nav-item-trigger" 
+                className="action-link-icon nav-item-trigger"
                 aria-label="Profile"
                 onClick={(e) => {
                   if (!user) {
@@ -182,7 +194,7 @@ export default function Header({ wishlist = {}, setWishlist, cart = {}, setCart 
                       <a href="#profile" className="profile-signup-btn" style={{ textAlign: 'center' }}>My Dashboard</a>
                       <button 
                         onClick={logout} 
-                        className="profile-login-btn" 
+                        className="profile-login-btn"
                         style={{ border: '1px solid #d4c5bd', background: 'none', cursor: 'pointer', padding: '10px', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '1px', color: '#2b221d', display: 'block', width: '100%', borderRadius: '2px', textAlign: 'center' }}
                       >
                         Log Out
@@ -196,7 +208,7 @@ export default function Header({ wishlist = {}, setWishlist, cart = {}, setCart 
                     <div className="profile-actions-stack">
                       <button 
                         onClick={() => setShowAuthModal(true)} 
-                        className="profile-signup-btn" 
+                        className="profile-signup-btn"
                         style={{ border: 'none', background: '#2b221d', color: '#fff', cursor: 'pointer', padding: '12px', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '1px', width: '100%', borderRadius: '2px', display: 'block', textAlign: 'center' }}
                       >
                         Sign In / Register
@@ -268,6 +280,7 @@ export default function Header({ wishlist = {}, setWishlist, cart = {}, setCart 
       {/* Bottom Tier: Category Links */}
       <div className="header-nav-row">
         <nav className="bottom-category-nav">
+
           
           {/* Rings Container with Mega-dropdown */}
           <div className="nav-item-container" onMouseLeave={() => setDisabledDropdown(null)}>
@@ -831,6 +844,7 @@ export default function Header({ wishlist = {}, setWishlist, cart = {}, setCart 
             </div>
           </div>
 
+
         </nav>
       </div>
       {/* Digital Gold Modal */}
@@ -838,7 +852,7 @@ export default function Header({ wishlist = {}, setWishlist, cart = {}, setCart 
         <div className="gold-modal-overlay">
           <div className="gold-modal-container">
             <button className="gold-modal-close" onClick={() => setGoldModalOpen(false)}>×</button>
-            
+
             {goldActiveTab === 'menu' && (
               <div className="gold-menu-view">
                 <h3>Zoniraz Digital Gold</h3>
@@ -935,24 +949,24 @@ export default function Header({ wishlist = {}, setWishlist, cart = {}, setCart 
       {mobileMenuOpen && (
         <div className="mobile-drawer-overlay" onClick={() => setMobileMenuOpen(false)}>
           <div className="mobile-drawer-content" onClick={(e) => e.stopPropagation()}>
-            
+
             {/* Header: Close Button & Quick Utilities */}
             <div className="drawer-header-row">
               <button className="drawer-close-btn" onClick={() => setMobileMenuOpen(false)}>
                 ✕
               </button>
-              
+
               <div className="drawer-quick-actions">
                 <a href="#delivery-stores" className="drawer-action-box" onClick={() => setMobileMenuOpen(false)}>
                   <span className="box-icon">🏪</span>
                   <span className="box-label">Stores</span>
                 </a>
-                
+
                 <a href="#digital-gold" className="drawer-action-box" onClick={(e) => { e.preventDefault(); setMobileMenuOpen(false); setGoldModalOpen(true); setGoldActiveTab('menu'); }}>
                   <span className="box-icon">🪙</span>
                   <span className="box-label">Gold</span>
                 </a>
-                
+
                 <div className="drawer-action-box flag-box">
                   <span className="flag-icon">🇮🇳</span>
                   <span className="box-label">ENG</span>
@@ -976,7 +990,7 @@ export default function Header({ wishlist = {}, setWishlist, cart = {}, setCart 
                 <a 
                   key={idx}
                   href={category.hash} 
-                  className="drawer-category-item" 
+                  className="drawer-category-item"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <div className="drawer-item-left-content">
@@ -998,7 +1012,7 @@ export default function Header({ wishlist = {}, setWishlist, cart = {}, setCart 
                 <div className="drawer-auth-buttons">
                   {user ? (
                     <button 
-                      onClick={() => { setMobileMenuOpen(false); logout(); }} 
+                      onClick={() => { setMobileMenuOpen(false); logout(); }}
                       className="drawer-btn login"
                       style={{ border: 'none', background: 'none', cursor: 'pointer', display: 'block', width: '100%' }}
                     >
@@ -1006,7 +1020,7 @@ export default function Header({ wishlist = {}, setWishlist, cart = {}, setCart 
                     </button>
                   ) : (
                     <button 
-                      onClick={() => { setMobileMenuOpen(false); setShowAuthModal(true); }} 
+                      onClick={() => { setMobileMenuOpen(false); setShowAuthModal(true); }}
                       className="drawer-btn login"
                       style={{ border: 'none', background: 'none', cursor: 'pointer', display: 'block', width: '100%' }}
                     >

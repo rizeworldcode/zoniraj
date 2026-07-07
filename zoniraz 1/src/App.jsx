@@ -74,12 +74,141 @@ function AppContent() {
   const [cart, setCart] = React.useState({});
   const [selectedProductId, setSelectedProductId] = React.useState(null);
   const [helpCategory, setHelpCategory] = React.useState('delivery');
+  const [selectedCategoryName, setSelectedCategoryName] = React.useState('Rings');
+  const [allProducts, setAllProducts] = React.useState([]);
+
+  React.useEffect(() => {
+    fetch('http://localhost:5000/api/admin/products')
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch');
+        return res.json();
+      })
+      .then(resData => {
+        if (resData.success && resData.data && resData.data.length > 0) {
+          const mapped = (resData.data || []).map(p => {
+            const id = p._id || p.product_id;
+            const name = p.product_title || p.name || 'Jewellery Item';
+            const price = Number(p.price) || Number(p.basePrice) || 0;
+            const discount = Number(p.discount) || 0;
+
+            // Get category name
+            const category = p.product_category || p.category || 'Rings';
+
+            // Get subcategory (style / tag fallback)
+            let subcategory = p.product_subcategory || p.productSubCategory || p.subcategory || '';
+            if (!subcategory && p.specs && p.specs.style) {
+              subcategory = p.specs.style;
+            }
+            if (!subcategory && p.tags && Array.isArray(p.tags)) {
+              const excludedTags = ['rings', 'ring', 'earrings', 'earring', 'pendants', 'pendant', 'necklaces', 'necklace', 'bracelets', 'bracelet', 'bangles', 'bangle', 'women', 'men', 'kids', 'diamond', 'gold', 'silver', 'platinum'];
+              const subTag = p.tags.find(t => !excludedTags.includes(t.toLowerCase()));
+              if (subTag) subcategory = subTag;
+            }
+
+            // Get gender
+            let genderList = [];
+            if (p.gender) genderList.push(p.gender);
+            if (p.specs && p.specs.gender) genderList.push(p.specs.gender);
+            if (p.tags && Array.isArray(p.tags)) {
+              if (p.tags.includes('women')) genderList.push('women');
+              if (p.tags.includes('men')) genderList.push('men');
+              if (p.tags.includes('kids')) genderList.push('kids');
+            }
+            const gender = [...new Set(genderList.map(s => s.toLowerCase()))].join(', ');
+
+            // Get images array
+            let images = [];
+            if (p.gallery) {
+              if (Array.isArray(p.gallery)) images = p.gallery;
+              else if (typeof p.gallery === 'string') images = p.gallery.split(',').map(s => s.trim());
+            } else if (p.images) {
+              if (Array.isArray(p.images)) images = p.images;
+              else if (typeof p.images === 'string') images = p.images.split(',').map(s => s.trim());
+            }
+
+            const size = p.size_id || (p.specs && p.specs.size) || 'Free Size';
+
+            // Get material / stone / metal
+            let matList = [];
+            if (p.product_type) matList.push(p.product_type);
+            if (p.stoneType) matList.push(p.stoneType);
+            if (p.defaultMetal) matList.push(p.defaultMetal);
+            if (p.specs) {
+              if (p.specs.metal) matList.push(p.specs.metal);
+              if (p.specs.stoneType) matList.push(p.specs.stoneType);
+            }
+            if (p.tags && Array.isArray(p.tags)) {
+              if (p.tags.includes('diamond')) matList.push('diamond');
+              if (p.tags.includes('gold')) matList.push('gold');
+              if (p.tags.includes('platinum')) matList.push('platinum');
+              if (p.tags.includes('rose gold') || p.tags.includes('rose-gold')) matList.push('rose gold');
+              if (p.tags.includes('yellow gold') || p.tags.includes('yellow-gold')) matList.push('yellow gold');
+              if (p.tags.includes('white gold') || p.tags.includes('white-gold')) matList.push('white gold');
+            }
+            const material = [...new Set(matList.map(s => s.toLowerCase()))].join(', ');
+            
+            const weight = p.product_weight || p.gold_weight || p.baseWeight || 0;
+            const fastDelivery = p.feature === '1';
+            const latest = p.sessional === '1';
+            const storePickup = p.topselling === '1';
+
+            return {
+              id,
+              productId: p.product_id || String(id),
+              name,
+              price,
+              originalPrice: price + discount,
+              images,
+              size,
+              material,
+              category,
+              weight,
+              fastDelivery,
+              latest,
+              storePickup,
+              tryAtHome: true,
+              subcategory,
+              gender
+            };
+          });
+
+          const mapImgUrl = (url, name) => {
+            if (!url) return 'https://placehold.co/600x600?text=' + encodeURIComponent(name);
+            if (url.startsWith('http')) return url;
+            return `http://localhost:5000/uploads/${url}`;
+          };
+
+          const fullyMapped = mapped.map(item => {
+            const clientImages = item.images.map(url => mapImgUrl(url, item.name));
+            if (clientImages.length === 0) {
+              clientImages.push(mapImgUrl('', item.name));
+            }
+            return {
+              ...item,
+              image: clientImages[0],
+              images: clientImages
+            };
+          });
+
+          setAllProducts(fullyMapped);
+        } else {
+          setAllProducts(products);
+        }
+      })
+      .catch(err => {
+        console.error('Error fetching all products, using fallback:', err);
+        setAllProducts(products);
+      });
+  }, []);
 
   React.useEffect(() => {
     const handleHashChange = () => {
-      const hash = window.location.hash.toLowerCase().replace('#', '');
+      const fullHash = window.location.hash.replace('#', '');
+      const [hashPath] = fullHash.split('?');
+      const hash = hashPath.toLowerCase();
+
       if (hash.startsWith('product-')) {
-        const id = parseInt(hash.replace('product-', ''));
+        const id = hash.replace('product-', '');
         setSelectedProductId(id);
         setCurrentView('product');
         window.scrollTo({ top: 0, behavior: 'instant' });
@@ -148,6 +277,22 @@ function AppContent() {
         if (matchedView) {
           setCurrentView(matchedView);
           window.scrollTo({ top: 0, behavior: 'instant' });
+        } else if (hash) {
+          const cleanHash = hash.toLowerCase().replace(/[^a-z0-9]/g, '');
+          const knownCategories = [
+            "Rings", "Bracelets", "Brooches", "Chains", "Bangles", "Anklets", 
+            "Necklaces", "Pendants", "Mangalsutras", "Nose Pins", "Earrings", 
+            "Gold Coins", "Solitaires", "Coins", "Men's Jewellery", "Women's Jewellery", "Kids Jewellery"
+          ];
+          let matchedCategory = knownCategories.find(cat => 
+            cat.toLowerCase().replace(/[^a-z0-9]/g, '') === cleanHash
+          );
+          if (!matchedCategory) {
+            matchedCategory = hash.replace(/-/g, ' ').split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+          }
+          setSelectedCategoryName(matchedCategory);
+          setCurrentView('rings');
+          window.scrollTo({ top: 0, behavior: 'instant' });
         } else {
           setCurrentView('home');
           setSelectedProductId(null);
@@ -160,62 +305,63 @@ function AppContent() {
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, [user]);
 
-  const selectedProduct = products.find(p => p.id === selectedProductId) || null;
+  const selectedProduct = (allProducts.length > 0 ? allProducts : products).find(p => String(p.id) === String(selectedProductId)) || null;
 
   return (
     <>
       <Header wishlist={wishlist} setWishlist={setWishlist} cart={cart} setCart={setCart} />
-        {currentView === 'product' ? (
-          <ProductDetailPage
-            product={selectedProduct}
-            wishlist={wishlist}
-            setWishlist={setWishlist}
-            cart={cart}
-            setCart={setCart}
-            onBack={() => { window.history.back(); }}
-          />
-        ) : currentView === 'rings' ? (
-          <CategoryPage category="Rings" wishlist={wishlist} setWishlist={setWishlist} cart={cart} setCart={setCart} />
-        ) : currentView === 'contact' ? (
-          <ContactPage />
-        ) : currentView === 'blog' ? (
-          <BlogPage />
-        ) : currentView === 'about' ? (
-          <AboutPage />
-        ) : currentView === 'terms' ? (
-          <TermsPage />
-        ) : currentView === 'privacy' ? (
-          <PrivacyPage />
-        ) : currentView === 'delivery' ? (
-          <DeliveryPage initialCategory={helpCategory} />
-        ) : currentView === 'wishlist' ? (
-          <WishlistPage wishlist={wishlist} setWishlist={setWishlist} cart={cart} setCart={setCart} />
-        ) : currentView === 'cart' ? (
-          <CartPage cart={cart} setCart={setCart} />
-        ) : currentView === 'profile' ? (
-          <UserDashboard />
-        ) : currentView === 'checkout' ? (
-          <CheckoutPage />
-        ) : (
-          <>
-            <Hero />
-            <ShopByCollection />
-            <FindPerfectMatch />
-            <TrendingNow />
-            <ZonirazWorld />
-            <NewArrivals />
-            <CuratedForYou />
-            <ZonirazAssurance />
-            <GoldExchange />
-            <ExchangeProgram />
-            <ZonirazExperience />
-            <BottomRibbon />
-          </>
-        )}
-        <Footer />
-        <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
-      </>
-    );
+      {currentView === 'product' ? (
+        <ProductDetailPage
+          product={selectedProduct}
+          products={allProducts}
+          wishlist={wishlist}
+          setWishlist={setWishlist}
+          cart={cart}
+          setCart={setCart}
+          onBack={() => { window.history.back(); }}
+        />
+      ) : currentView === 'rings' ? (
+        <CategoryPage category={selectedCategoryName} wishlist={wishlist} setWishlist={setWishlist} cart={cart} setCart={setCart} />
+      ) : currentView === 'contact' ? (
+        <ContactPage />
+      ) : currentView === 'blog' ? (
+        <BlogPage />
+      ) : currentView === 'about' ? (
+        <AboutPage />
+      ) : currentView === 'terms' ? (
+        <TermsPage />
+      ) : currentView === 'privacy' ? (
+        <PrivacyPage />
+      ) : currentView === 'delivery' ? (
+        <DeliveryPage initialCategory={helpCategory} />
+      ) : currentView === 'wishlist' ? (
+        <WishlistPage products={allProducts} wishlist={wishlist} setWishlist={setWishlist} cart={cart} setCart={setCart} />
+      ) : currentView === 'cart' ? (
+        <CartPage products={allProducts} cart={cart} setCart={setCart} />
+      ) : currentView === 'profile' ? (
+        <UserDashboard />
+      ) : currentView === 'checkout' ? (
+        <CheckoutPage />
+      ) : (
+        <>
+          <Hero />
+          <ShopByCollection />
+          <FindPerfectMatch />
+          <TrendingNow />
+          <ZonirazWorld />
+          <NewArrivals />
+          <CuratedForYou />
+          <ZonirazAssurance />
+          <GoldExchange />
+          <ExchangeProgram />
+          <ZonirazExperience />
+          <BottomRibbon />
+        </>
+      )}
+      <Footer />
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+    </>
+  );
 }
 
 export default function App() {

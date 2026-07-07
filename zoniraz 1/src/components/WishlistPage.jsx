@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { products } from '../data/products';
 
-export default function WishlistPage({ wishlist = {}, setWishlist }) {
+export default function WishlistPage({ products: propProducts = [], wishlist = {}, setWishlist }) {
   // Modal states
   const [callModalOpen, setCallModalOpen] = useState(false);
   const [callConnected, setCallConnected] = useState(false);
@@ -18,7 +18,8 @@ export default function WishlistPage({ wishlist = {}, setWishlist }) {
 
   // Get wishlisted products
   const wishlistedIds = Object.keys(wishlist).filter(id => wishlist[id]);
-  const wishlistedProducts = products.filter(p => wishlistedIds.includes(p.id.toString()));
+  const wishlistedProducts = (propProducts && propProducts.length > 0 ? propProducts : products)
+    .filter(p => wishlistedIds.includes(p.id.toString()));
 
   // Connect video call simulation
   useEffect(() => {

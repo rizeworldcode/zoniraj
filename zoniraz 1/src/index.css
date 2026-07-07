@@ -30,7 +30,7 @@
   --text-light-muted: #d5c8bf;
 
   --font-serif: 'Playfair Display', serif;
-  --font-sans: 'Playfair Display', serif;
+  --font-sans: 'Inter', sans-serif;
 
   --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
@@ -1546,7 +1546,6 @@ button {
   opacity: 1;
   transition: opacity 0.6s ease;
 }
-
 /* Progress bar indicators at top of the card */
 .za-card-progress-bar {
   position: absolute;
