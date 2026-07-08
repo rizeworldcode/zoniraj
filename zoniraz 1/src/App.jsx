@@ -308,7 +308,7 @@ function AppContent() {
         <>
           <Hero />
           <ShopByCollection />
-          <FindPerfectMatch />
+          <FindPerfectMatch products={allProducts} />
           <TrendingNow />
           <ZonirazWorld />
           <NewArrivals />
