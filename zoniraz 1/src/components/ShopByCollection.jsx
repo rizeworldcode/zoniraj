@@ -1,17 +1,16 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import bridalImg from '../assets/hero-model.png';
 import everydayImg from '../assets/gulnaara.png';
 import officeImg from '../assets/silver-necklaces.png';
 import solitaireImg from '../assets/solitaire-sets.png';
 import heritageImg from '../assets/nine-kt.png';
 
-const collections = [
+const staticCollections = [
   {
     id: 'bridal',
     label: 'SIGNATURE',
     title: 'Bridal Collection',
     image: bridalImg,
-    large: true,
     href: '#bridal',
   },
   {
@@ -19,7 +18,6 @@ const collections = [
     label: 'LIFESTYLE',
     title: 'Everyday Wear',
     image: everydayImg,
-    large: false,
     href: '#everyday',
   },
   {
@@ -27,7 +25,6 @@ const collections = [
     label: 'ELEGANT',
     title: 'Office Wear',
     image: officeImg,
-    large: false,
     href: '#office',
   },
   {
@@ -35,7 +32,6 @@ const collections = [
     label: 'FINE JEWELLERY',
     title: 'Solitaire Dream',
     image: solitaireImg,
-    large: false,
     href: '#solitaire',
   },
   {
@@ -43,33 +39,99 @@ const collections = [
     label: 'CLASSIC',
     title: 'Heritage Gold',
     image: heritageImg,
-    large: false,
     href: '#heritage',
   },
 ];
 
-export default function ShopByCollection() {
+const labelMap = {
+  'bridal': 'SIGNATURE',
+  'everyday': 'LIFESTYLE',
+  'office': 'ELEGANT',
+  'solitaire': 'FINE JEWELLERY',
+  'heritage': 'CLASSIC'
+};
+
+const defaultImages = {
+  'bridal': bridalImg,
+  'everyday': everydayImg,
+  'office': officeImg,
+  'solitaire': solitaireImg,
+  'heritage': heritageImg
+};
+
+export default function ShopByCollection({ products = [] }) {
+  const [collections, setCollections] = useState(staticCollections);
+
+  useEffect(() => {
+    fetch('http://localhost:55000/api/userSide/getCollection')
+      .then(res => res.json())
+      .then(resData => {
+        if (resData.success && resData.data && resData.data.length > 0) {
+          const mapped = resData.data.map(col => {
+            const id = col.slug || col._id;
+            const label = col.tags?.[0]?.toUpperCase() || labelMap[col.slug] || 'COLLECTION';
+            
+            // Search products to find real product image as fallback
+            const cleanSlug = String(col.slug || '').toLowerCase();
+            const matchingProducts = products.filter(p => {
+              const tagsList = p.tags ? (Array.isArray(p.tags) ? p.tags : [p.tags]) : [];
+              const matchesTag = tagsList.some(t => String(t).toLowerCase() === cleanSlug);
+              const matchesName = String(p.name || '').toLowerCase().includes(cleanSlug);
+              return matchesTag || matchesName;
+            });
+
+            // Map image path safely
+            let image = col.image;
+            if (!image || image === '/images/site/default-collection.jpg') {
+              if (matchingProducts.length > 0 && matchingProducts[0].image) {
+                image = matchingProducts[0].image;
+              } else {
+                image = defaultImages[col.slug] || bridalImg;
+              }
+            } else if (!image.startsWith('http') && !image.startsWith('/images/')) {
+              image = `http://localhost:55000/uploads/${image}`;
+            }
+
+            return {
+              id,
+              label,
+              title: col.name,
+              image,
+              href: `#${id}`
+            };
+          });
+          setCollections(mapped);
+        }
+      })
+      .catch(err => console.error('Error fetching collection from backend:', err));
+  }, [products]);
+
+  if (collections.length === 0) return null;
+
+  // homepage only shows 5 collections
+  const displayed = collections.slice(0, 5);
+
   return (
     <section className="shop-collection-section">
-      <div className="shop-collection-header">
+      <div className="shop-collection-header" style={{ cursor: 'pointer' }} onClick={() => window.location.hash = 'collections'}>
         <h2 className="shop-collection-title">Shop by Collection</h2>
         <p className="shop-collection-subtitle">Curated categories crafted for every occasion</p>
       </div>
 
       <div className="shop-collection-grid">
         {/* Large left card */}
-        <a href={collections[0].href} className="collection-card collection-card-large">
-          <img src={collections[0].image} alt={collections[0].title} className="collection-card-img" />
+        <a href={displayed[0].href} className="collection-card collection-card-large">
+          <img src={displayed[0].image} alt={displayed[0].title} className="collection-card-img" />
           <div className="collection-card-overlay">
-            <span className="collection-card-label">{collections[0].label}</span>
-            <h3 className="collection-card-name">{collections[0].title}</h3>
+            <span className="collection-card-label">{displayed[0].label}</span>
+            <h3 className="collection-card-name">{displayed[0].title}</h3>
             <span className="collection-card-explore">EXPLORE →</span>
           </div>
         </a>
 
         {/* Right 2x2 grid */}
         <div className="shop-collection-right">
-          {collections.slice(1).map((col) => (
+          {displayed.slice(1).map((col) => (
             <a key={col.id} href={col.href} className="collection-card collection-card-small">
               <img src={col.image} alt={col.title} className="collection-card-img" />
               <div className="collection-card-overlay">

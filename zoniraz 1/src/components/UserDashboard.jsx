@@ -35,11 +35,26 @@ export default function UserDashboard() {
   const fetchAddresses = async () => {
     setLoadingAddresses(true);
     try {
-      const res = await fetch('http://localhost:55000/api/addresses', {
+      const res = await fetch('http://localhost:55000/api/userSide/user_address_manager', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
-      if (res.ok) setAddresses(data);
+      if (res.ok) {
+        const mapped = (data || []).map(addr => ({
+          id: addr._id,
+          fullName: addr.name || '',
+          mobile: addr.mobile || '',
+          flatNumber: addr.house_number || '',
+          streetAddress: addr.street_name || '',
+          landmark: addr.landmark || '',
+          area: addr.type || '',
+          city: addr.city || '',
+          state: addr.state || '',
+          pincode: addr.zipcode || '',
+          isDefault: addr.primary || false
+        }));
+        setAddresses(mapped);
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -94,18 +109,31 @@ export default function UserDashboard() {
   const handleAddressSubmit = async (e) => {
     e.preventDefault();
     try {
-      const method = editingAddressId ? 'PUT' : 'POST';
-      const url = editingAddressId 
-        ? `http://localhost:55000/api/addresses/${editingAddressId}` 
-        : 'http://localhost:55000/api/addresses';
+      const isEdit = !!editingAddressId;
+      const url = isEdit 
+        ? `http://localhost:55000/api/userSide/user_address_manager_update?_id=${editingAddressId}` 
+        : 'http://localhost:55000/api/userSide/user_address_add';
+
+      const payload = {
+        name: addressForm.fullName,
+        mobile: addressForm.mobile,
+        house_number: addressForm.flatNumber,
+        street_name: addressForm.streetAddress,
+        landmark: addressForm.landmark,
+        type: addressForm.area,
+        city: addressForm.city,
+        state: addressForm.state,
+        zipcode: addressForm.pincode,
+        primary: addressForm.isDefault
+      };
 
       const res = await fetch(url, {
-        method,
+        method: 'POST', // Both add and update routes use POST on backend
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(addressForm)
+        body: JSON.stringify(payload)
       });
       if (res.ok) {
         setShowAddressForm(false);
@@ -127,7 +155,7 @@ export default function UserDashboard() {
   const handleDeleteAddress = async (id) => {
     if (window.confirm("Delete this address?")) {
       try {
-        const res = await fetch(`http://localhost:55000/api/addresses/${id}`, {
+        const res = await fetch(`http://localhost:55000/api/userSide/user_address_manager_delete?_id=${id}`, {
           method: 'DELETE',
           headers: { 'Authorization': `Bearer ${token}` }
         });
