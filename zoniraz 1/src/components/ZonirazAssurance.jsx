@@ -56,7 +56,7 @@ const stories = [
 export default function ZonirazAssurance() {
   const [activeIndex, setActiveIndex] = useState(2); // Start with the middle (3rd) card active
   const [isMuted, setIsMuted] = useState(true);
-  const [isPaused, setIsPaused] = useState(true); // Start paused by default
+  const [isPaused, setIsPaused] = useState(false); // Start playing by default
   const [isExpanded, setIsExpanded] = useState(false);
 
   const videoRefs = useRef([]);
@@ -83,12 +83,12 @@ export default function ZonirazAssurance() {
 
   const handleNext = () => {
     setActiveIndex((prev) => (prev + 1) % stories.length);
-    setIsPaused(true); // Keep new video paused until clicked
+    setIsPaused(false); // Play new video automatically
   };
 
   const handlePrev = () => {
     setActiveIndex((prev) => (prev - 1 + stories.length) % stories.length);
-    setIsPaused(true); // Keep new video paused until clicked
+    setIsPaused(false); // Play new video automatically
   };
 
   return (
@@ -126,26 +126,27 @@ export default function ZonirazAssurance() {
             }
 
             return (
-              <div 
-                key={story.id} 
+              <div
+                key={story.id}
                 className={`za-story-card ${positionClass}`}
                 onClick={() => {
                   if (index !== activeIndex) {
                     setActiveIndex(index);
-                    setIsPaused(true); // Keep newly activated video paused by default
+                    setIsPaused(false); // Autoplay when clicked/activated
                   }
                 }}
               >
                 {/* Card Background Video/Image */}
                 {story.video ? (
-                  <video 
+                  <video
                     ref={el => videoRefs.current[index] = el}
-                    src={story.video} 
-                    className="za-card-bg-img" 
-                    loop 
-                    muted={index !== activeIndex || isMuted} 
-                    playsInline 
+                    src={story.video}
+                    className="za-card-bg-img"
+                    loop
+                    muted={index !== activeIndex || isMuted}
+                    playsInline
                     style={{ objectFit: 'cover' }}
+                    autoPlay
                   />
                 ) : (
                   <img src={story.image} alt={story.title} className="za-card-bg-img" />
