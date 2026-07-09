@@ -232,7 +232,7 @@ export default function CheckoutPage() {
           )}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: step === 6 ? '1fr' : '1fr 360px', gap: '30px', alignItems: 'start' }}>
+        <div className="checkout-main-grid" style={{ gap: '30px', alignItems: 'start', gridTemplateColumns: step === 6 ? '1fr' : undefined }}>
           
           {/* LEFT SECTION: MAIN STEPS */}
           <div style={{ backgroundColor: '#fff', borderRadius: '20px', border: '1px solid #e1d8ea', padding: '36px', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
@@ -269,6 +269,7 @@ export default function CheckoutPage() {
                     {addresses.map(addr => (
                       <div 
                         key={addr.id} 
+                        className="checkout-address-card"
                         style={{ 
                           display: 'flex', 
                           justifyContent: 'space-between', 
@@ -315,7 +316,7 @@ export default function CheckoutPage() {
                 {(selectedAddressId === null || addresses.length === 0) && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', border: '1px solid #e1d8ea', padding: '24px', borderRadius: '16px', backgroundColor: '#faf7f5', marginBottom: '24px' }}>
                     <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: '16px', color: '#2b221d', margin: '0 0 10px 0' }}>Enter New Address Details</h3>
-                    <div style={{ display: 'flex', gap: '15px' }}>
+                    <div className="form-flex-row" style={{ display: 'flex', gap: '15px' }}>
                       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
                         <label style={labelStyle}>Full Name</label>
                         <input type="text" required value={newAddressForm.fullName} onChange={(e) => setNewAddressForm({ ...newAddressForm, fullName: e.target.value })} style={inputStyle} />
@@ -326,7 +327,7 @@ export default function CheckoutPage() {
                       </div>
                     </div>
 
-                    <div style={{ display: 'flex', gap: '15px' }}>
+                    <div className="form-flex-row" style={{ display: 'flex', gap: '15px' }}>
                       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
                         <label style={labelStyle}>Flat / House Number</label>
                         <input type="text" required value={newAddressForm.flatNumber} onChange={(e) => setNewAddressForm({ ...newAddressForm, flatNumber: e.target.value })} style={inputStyle} />
@@ -337,7 +338,7 @@ export default function CheckoutPage() {
                       </div>
                     </div>
 
-                    <div style={{ display: 'flex', gap: '15px' }}>
+                    <div className="form-flex-row" style={{ display: 'flex', gap: '15px' }}>
                       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
                         <label style={labelStyle}>Area / Colony</label>
                         <input type="text" required value={newAddressForm.area} onChange={(e) => setNewAddressForm({ ...newAddressForm, area: e.target.value })} style={inputStyle} />
@@ -348,7 +349,7 @@ export default function CheckoutPage() {
                       </div>
                     </div>
 
-                    <div style={{ display: 'flex', gap: '15px' }}>
+                    <div className="form-flex-row" style={{ display: 'flex', gap: '15px' }}>
                       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
                         <label style={labelStyle}>City</label>
                         <input type="text" required value={newAddressForm.city} onChange={(e) => setNewAddressForm({ ...newAddressForm, city: e.target.value })} style={inputStyle} />
@@ -385,7 +386,7 @@ export default function CheckoutPage() {
                 <h2 style={stepTitleStyle}>Delivery Method</h2>
                 
                 {/* Method Toggles */}
-                <div style={{ display: 'flex', gap: '20px', marginBottom: '30px' }}>
+                <div className="flex-wrap-row" style={{ display: 'flex', gap: '20px', marginBottom: '30px' }}>
                   <button onClick={() => setDeliveryMethod('delivery')} style={{ ...deliveryMethodTabStyle, ...(deliveryMethod === 'delivery' ? deliveryMethodActiveStyle : {}) }}>
                     🏠 Home Delivery
                   </button>
@@ -425,7 +426,7 @@ export default function CheckoutPage() {
                       );
                     })()}
 
-                    <div style={{ display: 'flex', gap: '15px' }}>
+                    <div className="form-flex-row" style={{ display: 'flex', gap: '15px' }}>
                       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
                         <label style={labelStyle}>Pickup Date</label>
                         <input type="date" required value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} style={inputStyle} />
@@ -443,7 +444,7 @@ export default function CheckoutPage() {
                   </div>
                 )}
 
-                <div style={{ display: 'flex', gap: '15px', marginTop: '30px' }}>
+                <div className="flex-wrap-row" style={{ display: 'flex', gap: '15px', marginTop: '30px' }}>
                   <button onClick={() => setStep(4)} style={btnStyle}>CONTINUE TO REVIEW</button>
                   <button onClick={() => setStep(2)} style={{ ...btnStyle, backgroundColor: '#a39084' }}>BACK</button>
                 </div>
@@ -470,7 +471,7 @@ export default function CheckoutPage() {
                   ))}
                 </div>
 
-                <div style={{ display: 'flex', gap: '15px' }}>
+                <div className="flex-wrap-row" style={{ display: 'flex', gap: '15px' }}>
                   <button onClick={() => setStep(5)} style={btnStyle}>PROCEED TO PAYMENT</button>
                   <button onClick={() => setStep(3)} style={{ ...btnStyle, backgroundColor: '#a39084' }}>BACK</button>
                 </div>
@@ -499,7 +500,7 @@ export default function CheckoutPage() {
 
                 {error && <div style={{ color: '#ff4d4f', fontSize: '13px', marginBottom: '15px' }}>{error}</div>}
 
-                <div style={{ display: 'flex', gap: '15px' }}>
+                <div className="flex-wrap-row" style={{ display: 'flex', gap: '15px' }}>
                   <button onClick={handleOrderSubmission} disabled={isProcessingPayment} style={btnStyle}>
                     {isProcessingPayment ? 'PROCESSING PAYMENT...' : 'PLACE ORDER'}
                   </button>

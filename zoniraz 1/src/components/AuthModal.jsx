@@ -1,9 +1,10 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { AuthContext } from '../context/AuthContext';
 
-export default function AuthModal({ isOpen, onClose, onSuccess }) {
+export default function AuthModal({ isOpen, onClose, onSuccess, initialTab = 'login' }) {
   const { login, signup, sendOtp, verifyOtp, authCallback, setAuthCallback } = useContext(AuthContext);
-  const [activeTab, setActiveTab] = useState('login'); // 'login' | 'signup' | 'otp'
+  const [activeTab, setActiveTab] = useState(initialTab); // 'login' | 'signup' | 'otp'
   const [error, setError] = useState('');
   
   // Login fields
@@ -25,6 +26,13 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
   const [otpMobile, setOtpMobile] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [otpCode, setOtpCode] = useState('');
+
+  useEffect(() => {
+    if (isOpen) {
+      setActiveTab(initialTab);
+      setError('');
+    }
+  }, [isOpen, initialTab]);
 
   if (!isOpen) return null;
 
@@ -108,7 +116,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
     }
   };
 
-  return (
+  return createPortal(
     <div className="auth-modal-overlay" style={styles.overlay}>
       <div className="auth-modal-card" style={styles.card}>
         <button onClick={onClose} style={styles.closeBtn}>✕</button>
@@ -303,7 +311,8 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
@@ -370,16 +379,19 @@ const styles = {
     flex: 1,
     padding: '12px',
     background: 'none',
-    border: 'none',
+    borderLeft: 'none',
+    borderRight: 'none',
+    borderTop: 'none',
+    borderBottom: '2px solid transparent',
     fontSize: '14px',
     fontWeight: '600',
     color: '#a39084',
     cursor: 'pointer',
-    transition: 'color 0.2s'
+    transition: 'color 0.2s, border-bottom-color 0.2s'
   },
   activeTab: {
     color: '#2b221d',
-    borderBottom: '2px solid #c5a880'
+    borderBottomColor: '#c5a880'
   },
   errorAlert: {
     backgroundColor: '#fff1f0',

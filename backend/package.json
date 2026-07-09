@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "type": "commonjs",
- "dependencies": {
+  "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "@vonage/server-sdk": "^3.15.0",
     "axios": "^1.7.2",
@@ -52,7 +52,6 @@
     "swagger-autogen": "^2.23.7",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",
-    "swisseph": "^0.5.17",
     "telesignsdk": "^3.0.0",
     "twilio": "^5.2.2",
     "webrtc": "^1.14.1"

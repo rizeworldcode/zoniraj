@@ -67,6 +67,13 @@
   --shadow-medium: 0 8px 24px rgba(15, 42, 74, 0.08);
 }
 
+html,
+body,
+#root {
+  width: 100%;
+  overflow-x: hidden !important;
+}
+
 body {
   font-family: var(--font-sans);
   background-color: var(--color-light-bg);
@@ -74,7 +81,6 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -122,11 +128,11 @@ button {
   box-shadow: inset 0 1.5px 1.5px rgba(255, 255, 255, 0.5), 0 12px 35px rgba(93, 70, 60, 0.08);
 }
 
-/* Main row: Utilities + Logo + Search & Actions */
+/* Main row: actions left, logo right */
 .header-main-row {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 12px 4%;
   border-bottom: 1px solid rgba(93, 70, 60, 0.1);
   gap: 20px;
@@ -135,7 +141,7 @@ button {
 .header-left-search {
   display: flex;
   align-items: center;
-  justify-self: start;
+  flex: 1;
 }
 
 .brand-logo-text-mobile {
@@ -146,7 +152,8 @@ button {
   display: flex;
   align-items: center;
   gap: 24px;
-  justify-self: end;
+  flex: 1;
+  justify-content: flex-end;
 }
 
 .desktop-search-wrapper {
@@ -186,14 +193,19 @@ button {
   font-size: 10px;
 }
 
-/* Center brand logo */
+/* Right brand logo */
 .header-brand {
-  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 0;
+  flex: 1;
 }
 
 .brand-logo-text {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   font-family: var(--font-serif);
   color: #ffffff;
@@ -201,6 +213,22 @@ button {
   text-transform: uppercase;
   transition: var(--transition-smooth);
   text-decoration: none;
+  position: relative;
+  height: 84px;
+  width: 100%;
+}
+
+.header-brand-logo-img {
+  height: 200px;
+  width: auto;
+  max-width: none;
+  object-fit: contain;
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1001;
 }
 
 .brand-logo-emblem {
@@ -345,6 +373,8 @@ button {
 .bottom-category-nav {
   display: flex;
   gap: 32px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .bottom-category-nav a {
@@ -2220,6 +2250,8 @@ button {
   /* Warm champagne beige text */
   padding: 60px 6% 30px;
   font-family: var(--font-sans);
+  border-top-left-radius: 40px !important;
+  border-top-right-radius: 40px !important;
 }
 
 .footer-top-row {
@@ -3187,7 +3219,7 @@ button {
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1100px) {
 
   /* Main row elements stacking cleanly */
   .header-main-row {
@@ -3451,7 +3483,7 @@ button {
 }
 
 /* Mobile responsive media query for Navbar buttons collapsing into 3-dot */
-@media (max-width: 768px) {
+@media (max-width: 1100px) {
   .mobile-menu-toggle-btn {
     display: flex;
   }
@@ -3706,6 +3738,135 @@ button {
   transform: translateY(1px);
 }
 
+.testimonial-section {
+  padding: 70px 20px 40px;
+  background: linear-gradient(135deg, #fffdf9 0%, #f7efe8 100%);
+}
+
+.testimonial-shell {
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.testimonial-intro {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.testimonial-eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  color: #8a6b54;
+  margin-bottom: 10px;
+}
+
+.testimonial-intro h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(28px, 3.6vw, 38px);
+  color: #2b221d;
+  margin: 0 0 10px;
+}
+
+.testimonial-intro p {
+  max-width: 700px;
+  margin: 0 auto;
+  color: #6f5f54;
+  line-height: 1.7;
+}
+
+.testimonial-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 24px;
+  align-items: stretch;
+}
+
+.testimonial-feature-card,
+.testimonial-card {
+  background: #fff;
+  border: 1px solid #e7d9cb;
+  box-shadow: 0 12px 35px rgba(99, 77, 64, 0.08);
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.testimonial-feature-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.testimonial-feature-card img {
+  width: 100%;
+  height: 320px;
+  object-fit: cover;
+}
+
+.testimonial-feature-body {
+  padding: 24px;
+}
+
+.testimonial-feature-body p {
+  color: #5f4d41;
+  font-size: 16px;
+  line-height: 1.8;
+  margin: 12px 0;
+}
+
+.testimonial-feature-body span {
+  color: #8a6b54;
+  font-weight: 600;
+}
+
+.testimonial-stars {
+  color: #d4a017;
+  letter-spacing: 0.12em;
+  font-size: 14px;
+}
+
+.testimonial-cards {
+  display: grid;
+  gap: 16px;
+}
+
+.testimonial-card {
+  padding: 22px;
+}
+
+.testimonial-card p {
+  color: #5f4d41;
+  line-height: 1.8;
+  margin: 12px 0 16px;
+}
+
+.testimonial-card-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  color: #7a6255;
+}
+
+@media (max-width: 900px) {
+  .testimonial-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .testimonial-section {
+    padding: 56px 16px 28px;
+  }
+
+  .testimonial-feature-card img {
+    height: 250px;
+  }
+
+  .testimonial-feature-body,
+  .testimonial-card {
+    padding: 18px;
+  }
+}
+
 /* Animations */
 @keyframes fadeInDrawer {
   from {
@@ -3843,4 +4004,296 @@ button {
 .offers-pill-btn:hover {
   background-color: #c5a880;
   color: #2b221d !important;
+}
+
+/* ==========================================================================
+   Antigravity Responsive Helper Classes and Media Queries
+   ========================================================================== */
+
+/* 2-Column Collection Grid optimization for Tablets/Mobile */
+@media (max-width: 1100px) {
+  .shop-collection-right {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+}
+@media (max-width: 480px) {
+  .shop-collection-right {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Mobile Header Logo adjustments (Logo on the left, menu icon shifted right) */
+@media (max-width: 1100px) {
+  .header-main-row {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 8px 16px !important;
+    gap: 8px !important;
+  }
+  .header-brand {
+    order: 1 !important;
+    display: flex !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    flex: 0 0 auto !important;
+  }
+  .header-brand-logo-img {
+    height: 84px !important;
+    max-width: 142px !important;
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    transform: none !important;
+  }
+  .header-right-actions {
+    order: 2 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin-left: auto !important;
+    margin-right: 0 !important;
+    flex-shrink: 0 !important;
+  }
+  .mobile-menu-toggle-btn {
+    order: 3 !important;
+    display: flex !important;
+    margin-left: 8px !important;
+    color: #5d463c !important; /* Cocoa brown hamburger icon */
+    padding: 6px 0 !important;
+    flex-shrink: 0 !important;
+  }
+  .action-link-icon {
+    color: #5d463c !important; /* Cocoa brown header icons */
+  }
+}
+
+/* Checkout Page Grid Responsive Stacking */
+.checkout-main-grid {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+}
+@media (max-width: 950px) {
+  .checkout-main-grid {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+}
+
+/* User Dashboard Main Grid Responsive Stacking */
+.dashboard-main-grid {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+}
+@media (max-width: 850px) {
+  .dashboard-main-grid {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
+  }
+}
+
+/* Dashboard Address Cards Grid */
+.address-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 650px) {
+  .address-grid {
+    grid-template-columns: 1fr !important;
+    gap: 15px !important;
+  }
+}
+
+/* Flex Form Input Rows responsive collapse */
+.form-flex-row {
+  display: flex;
+  gap: 15px;
+}
+@media (max-width: 600px) {
+  .form-flex-row {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+  .form-flex-row > div {
+    width: 100% !important;
+  }
+}
+
+/* Flex wrap helper for buttons/options */
+@media (max-width: 500px) {
+  .flex-wrap-row {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+  .flex-wrap-row button {
+    width: 100% !important;
+  }
+}
+
+/* Checkout shipping address items layout on mobile */
+@media (max-width: 600px) {
+  .checkout-address-card {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+    padding: 16px !important;
+  }
+  .checkout-address-card button {
+    width: 100% !important;
+    text-align: center !important;
+  }
+}
+
+/* Responsive adjustments for 3D Story Carousel (Zoniraz Assurance) */
+@media (max-width: 1100px) {
+  .za-story-carousel-container {
+    height: 440px !important;
+  }
+  .za-story-cards-wrapper {
+    width: 280px !important;
+    height: 400px !important;
+  }
+  .za-card-far-left,
+  .za-card-far-right {
+    display: none !important;
+  }
+  .za-card-left {
+    transform: translate3d(-130px, 0, -80px) rotateY(15deg) scale(0.85) !important;
+  }
+  .za-card-right {
+    transform: translate3d(130px, 0, -80px) rotateY(-15deg) scale(0.85) !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .za-story-carousel-container {
+    height: 380px !important;
+  }
+  .za-story-cards-wrapper {
+    width: 230px !important;
+    height: 340px !important;
+  }
+  .za-card-left,
+  .za-card-right {
+    display: none !important; /* Only show active card on narrow mobile */
+  }
+  .za-card-active {
+    transform: translate3d(0, 0, 0) scale(1) !important;
+  }
+}
+
+/* Responsive stack for Exchange Program section */
+@media (max-width: 768px) {
+  .ep-features-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 20px !important;
+  }
+}
+@media (max-width: 480px) {
+  .ep-features-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+}
+
+/* Responsive stack for Zoniraz Experience section */
+@media (max-width: 768px) {
+  .ze-grid {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+  .ze-card-img-wrap {
+    height: 280px !important;
+  }
+}
+
+/* Responsive stack for Zoniraz World section */
+@media (max-width: 768px) {
+  .zw-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  .zw-card-featured {
+    height: 320px !important;
+  }
+}
+
+/* Responsive adjustments for Gold Exchange section */
+@media (max-width: 768px) {
+  .ge-grid {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+  .ge-card {
+    padding: 30px 24px !important;
+    min-height: auto !important;
+  }
+  .ge-card-title {
+    font-size: 24px !important;
+    max-width: 100% !important;
+  }
+}
+
+/* Responsive stack for Bottom Ribbon section */
+@media (max-width: 768px) {
+  .ribbon-features-full {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
+    padding: 25px 6% !important;
+  }
+}
+
+/* Centered Mobile/Tablet Footer Layout overrides matching user design image */
+.footer-contact-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+  justify-content: flex-start;
+}
+
+@media (max-width: 1100px) {
+  .main-footer {
+    padding: 50px 8% 30px !important;
+  }
+  .footer-top-row {
+    grid-template-columns: 1fr !important;
+    gap: 40px !important;
+    text-align: center !important;
+  }
+  .footer-col {
+    align-items: center !important;
+    text-align: center !important;
+  }
+  .brand-col {
+    padding-right: 0 !important;
+  }
+  .footer-brand-logo img {
+    margin: 0 auto !important; /* Centered footer logo */
+  }
+  .footer-contact-actions {
+    justify-content: center !important;
+  }
+  .contact-info-list li {
+    justify-content: center !important;
+  }
+  .footer-social-wrapper {
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+    gap: 15px !important;
+  }
+  .footer-meta-wrapper {
+    flex-direction: column !important;
+    gap: 12px !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+  .footer-legal-links {
+    justify-content: center !important;
+    gap: 15px !important;
+  }
 }

@@ -24,6 +24,7 @@ export default function ProductDetailPage({ product, products: propProducts = []
   const [activeTab, setActiveTab] = useState('details'); // 'details' | 'price'
   const [stickyVisible, setStickyVisible] = useState(false);
   const [addedToCart, setAddedToCart] = useState(false);
+  const [isCustomizeOpen, setIsCustomizeOpen] = useState(false);
 
   // Try at Home Modal
   const [tryHomeOpen, setTryHomeOpen] = useState(false);
@@ -73,6 +74,14 @@ export default function ProductDetailPage({ product, products: propProducts = []
   const savings = product.originalPrice - product.price;
   const savingsPct = product.originalPrice > 0 ? Math.round((savings / product.originalPrice) * 100) : 0;
   const xPoints = Math.round(product.price * 0.03);
+  const metalAccentMap = {
+    '14 KT Yellow': '#d9a441',
+    '14 KT Rose': '#bf7b6b',
+    '18 KT Yellow': '#f0b84f',
+    '18 KT White': '#d9e3e8',
+    Platinum: '#8d97a2',
+  };
+  const currentMetalAccent = metalAccentMap[selectedMetal] || '#634d40';
 
   // All gallery images: product images + lifestyle images
   const allImages = [...(product.images || [product.image]), ...lifestyleImages];
@@ -348,12 +357,13 @@ export default function ProductDetailPage({ product, products: propProducts = []
 
         /* Customise Box */
         .pdp-customise-box {
-          border: 1px solid #c4aa9f;
-          border-radius: 8px;
+          border: 1px solid #d7c4b9;
+          border-radius: 12px;
           display: flex;
           gap: 0;
-          margin-bottom: 14px;
+          margin-bottom: 10px;
           overflow: hidden;
+          background: #fcf7f4;
         }
         .pdp-custom-item {
           flex: 1;
@@ -395,7 +405,93 @@ export default function ProductDetailPage({ product, products: propProducts = []
           cursor: pointer;
           text-transform: uppercase;
           letter-spacing: 0.5px;
-          min-width: 90px;
+          min-width: 96px;
+          transition: background 0.2s ease;
+        }
+        .pdp-customise-btn.active {
+          background: #a7774d;
+        }
+        .pdp-customise-card {
+          margin-bottom: 14px;
+          border: 1px solid #ead7cc;
+          border-radius: 14px;
+          padding: 14px;
+          background: linear-gradient(135deg, #fffaf7 0%, #f7ece6 100%);
+          box-shadow: 0 10px 24px rgba(99, 77, 64, 0.08);
+        }
+        .pdp-customise-card-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          gap: 10px;
+          margin-bottom: 12px;
+        }
+        .pdp-customise-card-title {
+          font-size: 14px;
+          font-weight: 800;
+          color: #634d40;
+        }
+        .pdp-customise-card-subtitle {
+          font-size: 12px;
+          color: #8a6a58;
+          margin-top: 3px;
+        }
+        .pdp-customise-pill {
+          background: #634d40;
+          color: #fff;
+          padding: 6px 10px;
+          border-radius: 999px;
+          font-size: 10px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+        .pdp-customise-preview {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          margin-bottom: 10px;
+        }
+        .pdp-customise-preview-ring {
+          width: 78px;
+          height: 78px;
+          border-radius: 50%;
+          border: 3px solid #634d40;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: radial-gradient(circle at 30% 30%, #fff, #f7ebe4);
+          flex-shrink: 0;
+        }
+        .pdp-customise-preview-stone {
+          width: 34px;
+          height: 34px;
+          border-radius: 50%;
+          background: #634d40;
+          box-shadow: inset 0 2px 4px rgba(255,255,255,0.35);
+        }
+        .pdp-customise-summary {
+          flex: 1;
+          display: grid;
+          gap: 8px;
+        }
+        .pdp-customise-summary > div {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-size: 12px;
+          color: #634d40;
+          border-bottom: 1px dashed #e4d4ca;
+          padding-bottom: 6px;
+        }
+        .pdp-customise-summary strong {
+          color: #8a6a58;
+          font-weight: 700;
+        }
+        .pdp-customise-note {
+          font-size: 11px;
+          color: #8a6a58;
+          line-height: 1.5;
         }
 
         /* Ring size learn how */
@@ -1200,8 +1296,40 @@ export default function ProductDetailPage({ product, products: propProducts = []
                 {diamondOptions.map(d => <option key={d} value={d}>{d}</option>)}
               </select>
             </div>
-            <button className="pdp-customise-btn">CUSTOMISE</button>
+            <button
+              className={`pdp-customise-btn ${isCustomizeOpen ? 'active' : ''}`}
+              onClick={() => setIsCustomizeOpen(prev => !prev)}
+            >
+              {isCustomizeOpen ? 'CLOSE' : 'CUSTOMISE'}
+            </button>
           </div>
+
+          {isCustomizeOpen && (
+            <div className="pdp-customise-card" role="region" aria-label="Customization preview">
+              <div className="pdp-customise-card-header">
+                <div>
+                  <div className="pdp-customise-card-title">Your custom style</div>
+                  <div className="pdp-customise-card-subtitle">A polished look crafted around your choices</div>
+                </div>
+                <div className="pdp-customise-pill">Preview</div>
+              </div>
+
+              <div className="pdp-customise-preview">
+                <div className="pdp-customise-preview-ring" style={{ borderColor: currentMetalAccent }}>
+                  <div className="pdp-customise-preview-stone" style={{ background: currentMetalAccent }} />
+                </div>
+                <div className="pdp-customise-summary">
+                  <div><strong>Size</strong><span>{selectedSize}</span></div>
+                  <div><strong>Metal</strong><span>{selectedMetal}</span></div>
+                  <div><strong>Diamond</strong><span>{selectedDiamond}</span></div>
+                </div>
+              </div>
+
+              <div className="pdp-customise-note">
+                Your choices are ready to be reviewed before checkout. We’ll style this piece to match your preferred finish and sparkle.
+              </div>
+            </div>
+          )}
 
           {/* Ring size guide */}
           <div className="pdp-ring-size-row">

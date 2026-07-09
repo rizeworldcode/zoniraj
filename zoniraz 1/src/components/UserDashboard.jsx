@@ -167,7 +167,7 @@ export default function UserDashboard() {
           Welcome, {user.firstName}!
         </h1>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: '30px', alignItems: 'start' }}>
+        <div className="dashboard-main-grid" style={{ gap: '30px', alignItems: 'start', gridTemplateColumns: undefined }}>
           {/* SIDEBAR TABS */}
           <div style={{ backgroundColor: '#fff', borderRadius: '20px', border: '1px solid #e1d8ea', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
             <button onClick={() => setActiveTab('profile')} style={{ ...tabBtnStyle, ...(activeTab === 'profile' ? activeTabStyle : {}) }}>👤 My Profile</button>
@@ -185,7 +185,7 @@ export default function UserDashboard() {
               <div>
                 <h2 style={panelTitleStyle}>My Profile Details</h2>
                 <form onSubmit={handleProfileUpdate} style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '500px' }}>
-                  <div style={{ display: 'flex', gap: '15px' }}>
+                  <div className="form-flex-row" style={{ display: 'flex', gap: '15px' }}>
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
                       <label style={labelStyle}>First Name</label>
                       <input type="text" value={profileForm.firstName} onChange={(e) => setProfileForm({ ...profileForm, firstName: e.target.value })} style={inputStyle} required />
@@ -224,7 +224,7 @@ export default function UserDashboard() {
                       {editingAddressId ? 'Edit Address' : 'New Address Details'}
                     </h3>
                     
-                    <div style={{ display: 'flex', gap: '15px' }}>
+                    <div className="form-flex-row" style={{ display: 'flex', gap: '15px' }}>
                       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
                         <label style={labelStyle}>Full Name</label>
                         <input type="text" required value={addressForm.fullName} onChange={(e) => setAddressForm({ ...addressForm, fullName: e.target.value })} style={inputStyle} />
@@ -235,7 +235,7 @@ export default function UserDashboard() {
                       </div>
                     </div>
 
-                    <div style={{ display: 'flex', gap: '15px' }}>
+                    <div className="form-flex-row" style={{ display: 'flex', gap: '15px' }}>
                       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
                         <label style={labelStyle}>Flat / House Number</label>
                         <input type="text" required value={addressForm.flatNumber} onChange={(e) => setAddressForm({ ...addressForm, flatNumber: e.target.value })} style={inputStyle} />
@@ -246,7 +246,7 @@ export default function UserDashboard() {
                       </div>
                     </div>
 
-                    <div style={{ display: 'flex', gap: '15px' }}>
+                    <div className="form-flex-row" style={{ display: 'flex', gap: '15px' }}>
                       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
                         <label style={labelStyle}>Area / Colony</label>
                         <input type="text" required value={addressForm.area} onChange={(e) => setAddressForm({ ...addressForm, area: e.target.value })} style={inputStyle} />
@@ -257,7 +257,7 @@ export default function UserDashboard() {
                       </div>
                     </div>
 
-                    <div style={{ display: 'flex', gap: '15px' }}>
+                    <div className="form-flex-row" style={{ display: 'flex', gap: '15px' }}>
                       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
                         <label style={labelStyle}>City</label>
                         <input type="text" required value={addressForm.city} onChange={(e) => setAddressForm({ ...addressForm, city: e.target.value })} style={inputStyle} />
@@ -289,7 +289,7 @@ export default function UserDashboard() {
                 ) : addresses.length === 0 ? (
                   <p style={{ color: '#746380', fontSize: '14px' }}>No saved addresses found. Add one to speed up checkout!</p>
                 ) : (
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                  <div className="address-grid" style={{ gap: '20px', gridTemplateColumns: undefined }}>
                     {addresses.map(addr => (
                       <div key={addr.id} style={{ border: '1px solid #e1d8ea', borderRadius: '16px', padding: '20px', position: 'relative', backgroundColor: addr.isDefault ? '#faf7f5' : '#ffffff' }}>
                         {addr.isDefault && (

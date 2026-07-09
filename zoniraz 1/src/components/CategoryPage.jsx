@@ -1561,17 +1561,6 @@ export default function CategoryPage({ category, wishlist = {}, setWishlist, car
         ▲
       </button>
 
-      <a 
-        href="https://wa.me/919999999999" 
-        target="_blank" 
-        rel="noopener noreferrer" 
-        className="floating-chat-btn"
-        aria-label="Contact support on WhatsApp"
-      >
-        <svg viewBox="0 0 24 24">
-          <path d="M12 2C6.48 2 2 6.48 2 12c0 2.17.7 4.2 1.94 5.86L2.3 22l4.3-1.63C8.2 21.3 10.03 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/>
-        </svg>
-      </a>
 
       {/* Delivery Check Modal */}
       {deliveryModalOpen && (

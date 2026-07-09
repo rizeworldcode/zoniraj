@@ -6,11 +6,8 @@ export default function Footer() {
       <div className="footer-top-row">
         {/* Logo & Tagline */}
         <div className="footer-col brand-col">
-          <a href="#" className="footer-brand-logo">
-            <svg className="footer-logo-diamond" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2L2 12h3v8h14v-8h3L12 2z" />
-            </svg>
-            <span className="footer-logo-text">ZONIRAZ</span>
+          <a href="#" className="footer-brand-logo" style={{ display: 'inline-block', marginBottom: '-50px' }}>
+            <img src="/zoni.png" alt="Zoniraz Logo" style={{ height: '150px', objectFit: 'contain', display: 'block', marginLeft: '-22px' }} />
           </a>
           <p className="footer-tagline">Crafting brilliance for generations.</p>
         </div>
@@ -40,14 +37,31 @@ export default function Footer() {
         {/* Contact Us */}
         <div className="footer-col">
           <h4 className="footer-col-title">Contact Us</h4>
-          <ul className="footer-links-list contact-info-list" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <li style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <ul className="footer-links-list contact-info-list" style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'inherit' }}>
+            <li style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'inherit' }}>
               <svg className="contact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: '16px', height: '16px', flexShrink: 0 }}>
                 <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
               </svg>
-              <span>+91 9784836060</span>
+              <span>97848 36080</span>
             </li>
-            <li style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '13px', lineHeight: '1.4' }}>
+            
+            {/* Quick Contact Buttons (Email & Call) */}
+            <li className="footer-contact-actions">
+              <a href="mailto:info@zoniraz.in" className="social-circle-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                  <polyline points="22,6 12,13 2,6" />
+                </svg>
+              </a>
+              <a href="tel:+919784836080" className="social-circle-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                </svg>
+              </a>
+            </li>
+
+            {/* Address: Shown on desktop only */}
+            <li className="desktop-only-util" style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '13px', lineHeight: '1.4' }}>
               <svg className="contact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: '16px', height: '16px', flexShrink: 0, marginTop: '3px' }}>
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
                 <circle cx="12" cy="10" r="3" />
@@ -127,7 +141,7 @@ export default function Footer() {
         {/* Copyright and Legal Links */}
         <div className="footer-meta-wrapper">
           <p className="copyright-text">
-            &copy; 2026 Zoniraz Limited. All Rights Reserved.
+            &copy; 2026 Zoniraz Limited. All Rights Reserved. Crafted by RizeWorld.
           </p>
           <div className="footer-legal-links">
             <a href="#terms">Terms & Conditions</a>

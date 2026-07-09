@@ -11,7 +11,7 @@ const stories = [
     title: 'Quality Craftsmanship',
     subtitle: 'Meticulously crafted jewelry for lasting brilliance.',
     image: craftsmanshipImg,
-    video: '/WhatsApp Video 2026-07-04 at 10.14.34 PM.mp4',
+    video: '/Zoniraz Bangle Collection.mp4',
     tag: 'Signature Quality',
     tagSub: '18KT & 22KT Pure Gold'
   },
@@ -20,7 +20,7 @@ const stories = [
     title: 'Ethically Sourced',
     subtitle: 'Responsibly selected gems, honoring earth and humanity.',
     image: ethicalImg,
-    video: '/WhatsApp Video 2026-07-04 at 10.14.35 PM.mp4',
+    video: '/ZONIRAZ Burma Ruby.mp4',
     tag: 'Conflict-Free Stones',
     tagSub: '100% Certified Origins'
   },
@@ -29,7 +29,7 @@ const stories = [
     title: '100% Transparency',
     subtitle: 'No hidden costs. Full breakdown of gold weights and stone values.',
     image: transparencyImg,
-    video: '/WhatsApp Video 2026-07-04 at 10.14.38 PM.mp4',
+    video: '/Zoniraz Final.mp4',
     tag: 'Certified Purity',
     tagSub: 'SGL & IGI Hallmarked'
   },
@@ -38,7 +38,7 @@ const stories = [
     title: 'Lifetime Warranty',
     subtitle: 'Enjoy free polishing, repair support, and quality checks.',
     image: warrantyImg,
-    video: '/WhatsApp Video 2026-07-04 at 10.14.39 PM.mp4',
+    video: '/Zoniraz 10+1.mp4',
     tag: 'Lifetime Care',
     tagSub: 'Free Maintenance Support'
   },
@@ -47,7 +47,7 @@ const stories = [
     title: 'Assured Buyback',
     subtitle: 'Secure the best value with our transparent buyback policies.',
     image: buybackImg,
-    video: '/WhatsApp Video 2026-07-04 at 10.14.39 PM (1).mp4',
+    video: '/Zoniraz Franchise.mp4',
     tag: 'Easy Buyback',
     tagSub: '100% Gold Value Return'
   }

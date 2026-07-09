@@ -28,10 +28,22 @@ import anekaImg from '../assets/aneka.png';
 import giftsForMomImg from '../assets/gifts-for-mom.png';
 import { products } from '../data/products';
 
+const fallbackCategories = [
+  { categoryName: 'Rings', products: [] },
+  { categoryName: 'Earrings', products: [] },
+  { categoryName: 'Bracelets & Bangles', products: [] },
+  { categoryName: 'Solitaires', products: [] },
+  { categoryName: 'Mangalsutras', products: [] },
+  { categoryName: 'Necklaces & Pendants', products: [] },
+  { categoryName: 'Silver', products: [] },
+  { categoryName: 'Gifting', products: [] }
+];
+
 export default function Header({ wishlist = {}, setWishlist, cart = {}, setCart }) {
   const { user, token, logout } = useContext(AuthContext);
   const { cartList } = useContext(CartContext);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authModalInitialTab, setAuthModalInitialTab] = useState('login');
   const [pincode, setPincode] = useState('');
   const [tempPincode, setTempPincode] = useState('');
   const [goldModalOpen, setGoldModalOpen] = useState(false);
@@ -48,11 +60,16 @@ export default function Header({ wishlist = {}, setWishlist, cart = {}, setCart 
     fetch('http://localhost:55000/api/userSide/GetNavbar')
       .then(res => res.json())
       .then(resData => {
-        if (resData.success) {
-          setCategories(resData.data || []);
+        if (resData.success && Array.isArray(resData.data) && resData.data.length > 0) {
+          setCategories(resData.data);
+        } else {
+          setCategories(fallbackCategories);
         }
       })
-      .catch(err => console.error('Error fetching navbar categories:', err))
+      .catch(err => {
+        console.error('Error fetching navbar categories:', err);
+        setCategories(fallbackCategories);
+      })
       .finally(() => setLoadingCategories(false));
   }, []);
 
@@ -91,7 +108,8 @@ export default function Header({ wishlist = {}, setWishlist, cart = {}, setCart 
   };
 
   return (
-    <header className={`jaypore-header ${scrolled ? 'scrolled' : ''}`}>
+    <>
+      <header className={`jaypore-header ${scrolled ? 'scrolled' : ''}`}>
       {/* Top Bar matching Candere style */}
       <div className="header-top-bar desktop-only-util">
         <div className="top-bar-left">
@@ -145,17 +163,9 @@ export default function Header({ wishlist = {}, setWishlist, cart = {}, setCart 
         </div>
 
         {/* Center: Brand Logo */}
-        <div className="header-brand" style={{ position: 'relative', width: '280px', height: '50px' }}>
-          <a href="#" className="brand-logo-text" style={{ display: 'block', width: '100%', height: '100%' }}>
-            <img src="/zoni.png" alt="Zoniraz Logo" style={{
-              height: '160px',
-              objectFit: 'contain',
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              zIndex: 10
-            }} />
+        <div className="header-brand">
+          <a href="#" className="brand-logo-text">
+            <img src="/zoni.png" alt="Zoniraz Logo" className="header-brand-logo-img" />
           </a>
         </div>
 
@@ -241,7 +251,7 @@ export default function Header({ wishlist = {}, setWishlist, cart = {}, setCart 
                       <button
                         onClick={() => setShowAuthModal(true)}
                         className="profile-signup-btn"
-                        style={{ border: 'none', background: '#2b221d', color: '#fff', cursor: 'pointer', padding: '12px', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '1px', width: '100%', borderRadius: '2px', display: 'block', textAlign: 'center' }}
+                        style={{ border: '1px solid #2b221d', background: 'none', color: '#2b221d', cursor: 'pointer', padding: '12px', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '1px', width: '100%', borderRadius: '2px', display: 'block', textAlign: 'center' }}
                       >
                         Sign In / Register
                       </button>
@@ -312,9 +322,9 @@ export default function Header({ wishlist = {}, setWishlist, cart = {}, setCart 
       {/* Bottom Tier: Category Links */}
       <div className="header-nav-row">
         <nav className="bottom-category-nav">
-          {categories
+          {(categories.length > 0 ? categories : fallbackCategories)
             .filter(cat => {
-              const name = cat.categoryName.toLowerCase().trim();
+              const name = (cat.categoryName || '').toLowerCase().trim();
               return name !== "men's jewellery" &&
                 name !== "women's jewellery" &&
                 name !== "kids jewellery" &&
@@ -323,7 +333,8 @@ export default function Header({ wishlist = {}, setWishlist, cart = {}, setCart 
                 name !== "kids";
             })
             .map((cat, idx) => {
-              const categorySlug = cat.categoryName.toLowerCase().replace(/ /g, '-');
+              const displayName = cat.categoryName || 'Collection';
+              const categorySlug = displayName.toLowerCase().replace(/ /g, '-');
 
               // Extract unique subcategories
               const subcategories = [...new Set((cat.products || [])
@@ -347,7 +358,7 @@ export default function Header({ wishlist = {}, setWishlist, cart = {}, setCart 
                   onMouseLeave={() => setDisabledDropdown(null)}
                 >
                   <a href={`#${categorySlug}`} className="nav-item-trigger" onClick={() => setDisabledDropdown(categorySlug)}>
-                    {cat.categoryName}
+                    {displayName}
                   </a>
                   <div className={`mega-dropdown ${disabledDropdown === categorySlug ? 'force-hide' : ''}`}>
                     <div className="mega-dropdown-inner">
@@ -360,7 +371,7 @@ export default function Header({ wishlist = {}, setWishlist, cart = {}, setCart 
                               href={`#${categorySlug}`} 
                               onClick={() => setTimeout(() => setDisabledDropdown(categorySlug), 150)}
                             >
-                              All {cat.categoryName}
+                              All {displayName}
                             </a>
                           </li>
                           {subcategories.map((sub, sIdx) => {
@@ -535,7 +546,9 @@ export default function Header({ wishlist = {}, setWishlist, cart = {}, setCart 
             })}
         </nav>
       </div>
-      {/* Digital Gold Modal */}
+    </header>
+
+    {/* Digital Gold Modal */}
       {goldModalOpen && (
         <div className="gold-modal-overlay">
           <div className="gold-modal-container">
@@ -707,13 +720,20 @@ export default function Header({ wishlist = {}, setWishlist, cart = {}, setCart 
                       LOG OUT
                     </button>
                   ) : (
-                    <button
-                      onClick={() => { setMobileMenuOpen(false); setShowAuthModal(true); }}
-                      className="drawer-btn login"
-                      style={{ border: 'none', background: 'none', cursor: 'pointer', display: 'block', width: '100%' }}
-                    >
-                      SIGN IN
-                    </button>
+                    <>
+                      <button
+                        onClick={() => { setMobileMenuOpen(false); setAuthModalInitialTab('login'); setShowAuthModal(true); }}
+                        className="drawer-btn login"
+                      >
+                        LOGIN
+                      </button>
+                      <button
+                        onClick={() => { setMobileMenuOpen(false); setAuthModalInitialTab('signup'); setShowAuthModal(true); }}
+                        className="drawer-btn signup"
+                      >
+                        SIGN UP
+                      </button>
+                    </>
                   )}
                 </div>
               </div>
@@ -723,7 +743,11 @@ export default function Header({ wishlist = {}, setWishlist, cart = {}, setCart 
         </div>
       )}
 
-      <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
-    </header>
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        initialTab={authModalInitialTab}
+      />
+    </>
   );
 }

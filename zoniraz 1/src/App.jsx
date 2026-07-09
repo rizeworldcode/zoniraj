@@ -11,6 +11,7 @@ import ZonirazAssurance from './components/ZonirazAssurance';
 import GoldExchange from './components/GoldExchange';
 import ExchangeProgram from './components/ExchangeProgram';
 import ZonirazExperience from './components/ZonirazExperience';
+import TestimonialSection from './components/TestimonialSection';
 import BottomRibbon from './components/BottomRibbon';
 import Footer from './components/Footer';
 import CategoryPage from './components/CategoryPage';
@@ -317,6 +318,7 @@ function AppContent() {
           <GoldExchange />
           <ExchangeProgram />
           <ZonirazExperience />
+          <TestimonialSection />
           <BottomRibbon />
         </>
       )}
