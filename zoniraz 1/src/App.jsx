@@ -24,6 +24,7 @@ import AboutPage from './components/AboutPage';
 import DeliveryPage from './components/DeliveryPage';
 import UserDashboard from './components/UserDashboard';
 import CheckoutPage from './components/CheckoutPage';
+import AllCollectionsPage from './components/AllCollectionsPage';
 import { AuthProvider, AuthContext } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import AuthModal from './components/AuthModal';
@@ -204,6 +205,9 @@ function AppContent() {
         setSelectedProductId(id);
         setCurrentView('product');
         window.scrollTo({ top: 0, behavior: 'instant' });
+      } else if (hash === 'collections' || hash === 'all-collections') {
+        setCurrentView('all-collections');
+        window.scrollTo({ top: 0, behavior: 'instant' });
       } else if (hash === 'wishlist') {
         setCurrentView('wishlist');
         window.scrollTo({ top: 0, behavior: 'instant' });
@@ -303,13 +307,15 @@ function AppContent() {
         <CartPage products={allProducts} cart={cart} setCart={setCart} />
       ) : currentView === 'profile' ? (
         <UserDashboard />
+      ) : currentView === 'all-collections' ? (
+        <AllCollectionsPage products={allProducts} />
       ) : currentView === 'checkout' ? (
         <CheckoutPage />
       ) : (
         <>
           <Hero />
-          <ShopByCollection />
-          <FindPerfectMatch />
+          <ShopByCollection products={allProducts} />
+          <FindPerfectMatch products={allProducts} />
           <TrendingNow />
           <ZonirazWorld />
           <NewArrivals />

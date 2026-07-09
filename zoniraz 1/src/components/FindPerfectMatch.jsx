@@ -8,7 +8,19 @@ import charmsImg from '../assets/watch-charms.png';
 import layeredImg from '../assets/layered-necklaces.png';
 import banglesImg from '../assets/stretchable-bangles.png';
 
-const categories = [
+const defaultImages = {
+  'rings': earringsImg,
+  'earrings': hoopsImg,
+  'pendants': necklacesImg,
+  'nose-pins': charmsImg,
+  'bracelets': braceletsImg,
+  'mangalsutra': mangalsutraImg,
+  'mangalsutras': mangalsutraImg,
+  'necklaces': layeredImg,
+  'bangles': banglesImg
+};
+
+const staticCategories = [
   { id: 'rings',        label: 'RINGS',           image: earringsImg },
   { id: 'earrings',     label: 'EARRINGS',         image: hoopsImg },
   { id: 'pendants',     label: 'PENDANTS',         image: necklacesImg },
@@ -19,7 +31,7 @@ const categories = [
   { id: 'bangles',      label: 'BANGLES',          image: banglesImg },
 ];
 
-export default function FindPerfectMatch() {
+export default function FindPerfectMatch({ products = [] }) {
   const scrollRef = useRef(null);
 
   const scroll = (dir) => {
@@ -27,6 +39,52 @@ export default function FindPerfectMatch() {
       scrollRef.current.scrollBy({ left: dir * 320, behavior: 'smooth' });
     }
   };
+
+  // Dynamically extract categories from real backend products
+  let categories = staticCategories;
+  if (products && products.length > 0) {
+    const categoriesMap = {};
+    products.forEach(p => {
+      if (!p.category) return;
+      const catName = String(p.category).trim();
+      const cleanName = catName.toLowerCase();
+
+      // Exclude demographics
+      if (
+        cleanName === "men's jewellery" ||
+        cleanName === "women's jewellery" ||
+        cleanName === "kids jewellery" ||
+        cleanName === "men" ||
+        cleanName === "women" ||
+        cleanName === "kids"
+      ) {
+        return;
+      }
+
+      const id = cleanName.replace(/ /g, '-');
+      if (!categoriesMap[cleanName]) {
+        categoriesMap[cleanName] = {
+          id,
+          label: catName.toUpperCase(),
+          image: p.image || p.images?.[0] || ''
+        };
+      } else {
+        if (!categoriesMap[cleanName].image && p.image) {
+          categoriesMap[cleanName].image = p.image;
+        }
+      }
+    });
+
+    const parsed = Object.values(categoriesMap);
+    if (parsed.length > 0) {
+      categories = parsed.map(cat => {
+        if (!cat.image || cat.image.includes('placehold.co')) {
+          cat.image = defaultImages[cat.id] || defaultImages['rings'];
+        }
+        return cat;
+      });
+    }
+  }
 
   return (
     <section className="fpm-section">
