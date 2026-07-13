@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { products } from '../data/products';
 import { CartContext } from '../context/CartContext';
+import ringVideo from '../assets/videos/zoniraz ring .mp4';
 
 // Lifestyle / model images from Unsplash (free to use)
 const lifestyleImages = [
@@ -50,6 +51,7 @@ export default function ProductDetailPage({ product, products: propProducts = []
   const [stickyVisible, setStickyVisible] = useState(false);
   const [addedToCart, setAddedToCart] = useState(false);
   const [isCustomizeOpen, setIsCustomizeOpen] = useState(false);
+  const [sizingVideoOpen, setSizingVideoOpen] = useState(false);
   const { addToCart } = useContext(CartContext);
 
   const [pricingDetails, setPricingDetails] = useState({
@@ -155,36 +157,64 @@ export default function ProductDetailPage({ product, products: propProducts = []
         const prodId = product?._id || product?.id;
         if (!prodId) return;
 
-        const response = await fetch('http://localhost:55000/api/productPricing', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            product_id: prodId,
-            size: selectedSize,
-            metal: selectedMetal,
-            diamond: selectedDiamond
-          })
-        });
-        const data = await response.json();
+        let metalKey = "14k";
+        if (selectedMetal.includes("18")) metalKey = "18k";
+        else if (selectedMetal.includes("9")) metalKey = "9k";
+        else if (selectedMetal.includes("22")) metalKey = "22k";
+        else if (selectedMetal.includes("24")) metalKey = "24k";
+
+        let diamondKey = selectedDiamond;
+        if (selectedDiamond === "EF-VS") diamondKey = "EF-VVS";
+
+        const [priceRes, ratesRes] = await Promise.all([
+          fetch('http://localhost:55000/api/productPricing', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              product_id: prodId,
+              size: selectedSize,
+              metal: metalKey,
+              diamond: diamondKey
+            })
+          }),
+          fetch('http://localhost:55000/api/jewellery-pricing').catch(() => null)
+        ]);
+
+        const data = await priceRes.json();
+        const ratesData = ratesRes ? await ratesRes.json().catch(() => null) : null;
+
         if (data.success && active) {
+          const rates = (ratesData && ratesData.success) ? ratesData.data : { gold_rate_24k: 5200, gst_percent: 3 };
           const price = data.price || pricingDetails.price;
-          const goldRate14k = (product?.price && product?.gold_weight) ? Math.round((pricingDetails.goldCost || 0) / (product.gold_weight || 1)) : 3033;
-          const goldCost = Math.round((data.gold_weight || 0) * goldRate14k);
-          const gemstoneCost = (product.gemstone_weight || 0) * 1500;
+
+          // Compute gold rate based on karat
+          let goldRate = rates.gold_rate_14k || 3033;
+          if (metalKey === "18k") goldRate = rates.gold_rate_24k * 18 / 24;
+          else if (metalKey === "9k") goldRate = rates.gold_rate_24k * 9 / 24;
+          else if (metalKey === "22k") goldRate = rates.gold_rate_24k * 22 / 24;
+          else if (metalKey === "24k") goldRate = rates.gold_rate_24k * 24 / 24;
+
+          const goldCost = Math.round((data.gold_weight || 0) * goldRate);
+          const diamondCost = Math.round((data.diamond_weight || 0) * (data.diamond_rate_used || rates.diamond_rate || 85000));
+          const gemstoneCost = (product.gemstone_weight || 0) * (rates.gemstone_rate || 1500);
           const makingCharges = product.making_charges || 0;
-          const subtotal = goldCost + pricingDetails.diamondCost + gemstoneCost + makingCharges;
+          const solitaireCost = product.solitaires_price || 0;
+
+          const subtotal = goldCost + diamondCost + gemstoneCost + makingCharges + solitaireCost;
           const gst = price - subtotal;
 
-          setPricingDetails(prev => ({
-            ...prev,
+          setPricingDetails({
             price: price,
             goldCost: goldCost,
-            goldWeight: data.gold_weight || prev.goldWeight,
+            diamondCost: diamondCost,
+            gemstoneCost: gemstoneCost,
+            makingCharges: makingCharges,
             gst: Math.max(0, gst),
-            subtotal: subtotal
-          }));
+            subtotal: subtotal,
+            goldWeight: data.gold_weight || product?.gold_weight || 0
+          });
         }
       } catch (err) {
         console.error('Failed to load custom pricing:', err);
@@ -1512,7 +1542,7 @@ export default function ProductDetailPage({ product, products: propProducts = []
           {showSizing && (
             <div className="pdp-ring-size-row">
               <span>{isRing ? 'Not sure about your ring size?' : 'Not sure about your bangle size?'}</span>
-              <span className="pdp-learn-how-link">LEARN HOW ▶</span>
+              <span className="pdp-learn-how-link" onClick={() => setSizingVideoOpen(true)} style={{ cursor: 'pointer' }}>LEARN HOW ▶</span>
             </div>
           )}
 
@@ -1883,6 +1913,38 @@ export default function ProductDetailPage({ product, products: propProducts = []
             <div className="pdp-call-controls">
               <button className="pdp-ctrl-btn" style={{ background: '#5c4b6e' }} onClick={() => alert('Muted')}>🎙</button>
               <button className="pdp-ctrl-btn" style={{ background: '#f44336' }} onClick={() => setVideoOpen(false)}>🛑</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Sizing Video Modal */}
+      {sizingVideoOpen && (
+        <div className="pdp-modal-overlay" onClick={() => setSizingVideoOpen(false)}>
+          <div 
+            className="pdp-modal-box" 
+            style={{ 
+              width: '1470px', 
+              maxWidth: '95vw', 
+              height: '1000px', 
+              maxHeight: '90vh', 
+              padding: '24px', 
+              display: 'flex', 
+              flexDirection: 'column',
+              boxSizing: 'border-box'
+            }} 
+            onClick={e => e.stopPropagation()}
+          >
+            <button className="pdp-modal-close" onClick={() => setSizingVideoOpen(false)}>✕</button>
+            <h3 className="pdp-modal-title" style={{ marginBottom: 12 }}>How to Measure Your Size</h3>
+            <div style={{ flex: 1, position: 'relative', width: '100%', borderRadius: 8, overflow: 'hidden', backgroundColor: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <video
+                src={ringVideo}
+                autoPlay
+                loop
+                playsInline
+                style={{ width: '100%', height: '100%', display: 'block', objectFit: 'contain' }}
+              />
             </div>
           </div>
         </div>
