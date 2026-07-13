@@ -15,8 +15,33 @@ const metalOptions = ['14 KT Yellow', '14 KT Rose', '18 KT Yellow', '18 KT White
 const diamondOptions = ['FG-SI', 'EF-VS', 'GH-SI', 'IJ-SI'];
 
 export default function ProductDetailPage({ product, products: propProducts = [], wishlist = {}, setWishlist, cart = {}, setCart, onBack }) {
+  const categoryName = (product?.product_category || product?.category || '').toLowerCase();
+  const isRing = categoryName === 'rings' || categoryName === 'ring';
+  const isBangleOrBracelet = categoryName === 'bangles' || categoryName === 'bangle' || categoryName === 'bracelets' || categoryName === 'bracelet';
+  const showSizing = isRing || isBangleOrBracelet;
+
+  const getProductSizes = () => {
+    if (!product) return [];
+    if (product.size_id) {
+      return product.size_id.split(',').map(s => s.trim()).filter(Boolean);
+    }
+    if (isRing) {
+      return [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].map(String);
+    }
+    if (isBangleOrBracelet) {
+      return ['2.2', '2.4', '2.6', '2.8', '2.10', '3.0'];
+    }
+    return [];
+  };
+
+  const activeSizes = getProductSizes();
+
   const [selectedImage, setSelectedImage] = useState(0);
-  const [selectedSize, setSelectedSize] = useState(12);
+  const [selectedSize, setSelectedSize] = useState(
+    isBangleOrBracelet
+      ? (product?.banglesize_id && product?.banglesize_id !== '0' ? product.banglesize_id : '2.4')
+      : 12
+  );
   const [selectedMetal, setSelectedMetal] = useState('14 KT Yellow');
   const [selectedDiamond, setSelectedDiamond] = useState('IJ-SI');
   const [pincode, setPincode] = useState('');
@@ -25,6 +50,7 @@ export default function ProductDetailPage({ product, products: propProducts = []
   const [stickyVisible, setStickyVisible] = useState(false);
   const [addedToCart, setAddedToCart] = useState(false);
   const [isCustomizeOpen, setIsCustomizeOpen] = useState(false);
+  const { addToCart } = useContext(CartContext);
 
   const [pricingDetails, setPricingDetails] = useState({
     price: product?.price || 0,
@@ -39,12 +65,97 @@ export default function ProductDetailPage({ product, products: propProducts = []
 
   useEffect(() => {
     let active = true;
-    const fetchCalculatedPrice = async () => {
+    const fetchBasePricing = async () => {
       try {
         const prodId = product?._id || product?.id;
         if (!prodId) return;
 
-        const response = await fetch('http://localhost:55000/api/jewellery-pricing/calculate', {
+        const response = await fetch('http://localhost:55000/api/productBasePricing');
+        const data = await response.json();
+        if (data.success && active && Array.isArray(data.data)) {
+          const matched = data.data.find(item => String(item._id) === String(prodId) || String(item.product_id) === String(prodId));
+          if (matched) {
+            const price = matched.base_price_withGST;
+            const goldCost = matched.gold_price || 0;
+            const diamondCost = matched.diamond_price || 0;
+            
+            const gemstoneCost = (product.gemstone_weight || 0) * 1500;
+            const makingCharges = product.making_charges || 0;
+            const subtotal = goldCost + diamondCost + gemstoneCost + makingCharges;
+            const gst = price - subtotal;
+
+            setPricingDetails({
+              price: price,
+              goldCost: goldCost,
+              diamondCost: diamondCost,
+              gemstoneCost: gemstoneCost,
+              makingCharges: makingCharges,
+              gst: Math.max(0, gst),
+              subtotal: subtotal,
+              goldWeight: product?.gold_weight || 0
+            });
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load base pricing:', err);
+      }
+    };
+    if (product?._id || product?.id) {
+      fetchBasePricing();
+    }
+    return () => {
+      active = false;
+    };
+  }, [product?._id, product?.id]);
+
+  useEffect(() => {
+    let active = true;
+    const defaultSize = isBangleOrBracelet
+      ? (product?.banglesize_id && product?.banglesize_id !== '0' ? product.banglesize_id : '2.4')
+      : 12;
+    const isCustomized = selectedSize !== defaultSize || selectedMetal !== '14 KT Yellow' || selectedDiamond !== 'IJ-SI';
+
+    if (!isCustomized) {
+      if (product?._id || product?.id) {
+        const prodId = product?._id || product?.id;
+        fetch('http://localhost:55000/api/productBasePricing')
+          .then(res => res.json())
+          .then(data => {
+            if (data.success && active && Array.isArray(data.data)) {
+              const matched = data.data.find(item => String(item._id) === String(prodId) || String(item.product_id) === String(prodId));
+              if (matched) {
+                const price = matched.base_price_withGST;
+                const goldCost = matched.gold_price || 0;
+                const diamondCost = matched.diamond_price || 0;
+                const gemstoneCost = (product.gemstone_weight || 0) * 1500;
+                const makingCharges = product.making_charges || 0;
+                const subtotal = goldCost + diamondCost + gemstoneCost + makingCharges;
+                const gst = price - subtotal;
+
+                setPricingDetails({
+                  price: price,
+                  goldCost: goldCost,
+                  diamondCost: diamondCost,
+                  gemstoneCost: gemstoneCost,
+                  makingCharges: makingCharges,
+                  gst: Math.max(0, gst),
+                  subtotal: subtotal,
+                  goldWeight: product?.gold_weight || 0
+                });
+              }
+            }
+          })
+          .catch(err => console.error('Failed to restore base pricing:', err));
+      }
+      return;
+    }
+
+    const fetchCustomPricing = async () => {
+      try {
+        const prodId = product?._id || product?.id;
+        if (!prodId) return;
+
+        const response = await fetch('http://localhost:55000/api/productPricing', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -58,24 +169,30 @@ export default function ProductDetailPage({ product, products: propProducts = []
         });
         const data = await response.json();
         if (data.success && active) {
-          setPricingDetails({
-            price: data.price,
-            goldCost: Math.round(data.goldCost || 0),
-            diamondCost: Math.round(data.diamondCost || 0),
-            gemstoneCost: Math.round(data.gemstoneCost || 0),
-            makingCharges: Math.round(data.makingCharges || 0),
-            gst: Math.round(data.gst || 0),
-            subtotal: Math.round(data.subtotal || 0),
-            goldWeight: data.goldWeight || product?.gold_weight || 0
-          });
+          const price = data.price || pricingDetails.price;
+          const goldRate14k = (product?.price && product?.gold_weight) ? Math.round((pricingDetails.goldCost || 0) / (product.gold_weight || 1)) : 3033;
+          const goldCost = Math.round((data.gold_weight || 0) * goldRate14k);
+          const gemstoneCost = (product.gemstone_weight || 0) * 1500;
+          const makingCharges = product.making_charges || 0;
+          const subtotal = goldCost + pricingDetails.diamondCost + gemstoneCost + makingCharges;
+          const gst = price - subtotal;
+
+          setPricingDetails(prev => ({
+            ...prev,
+            price: price,
+            goldCost: goldCost,
+            goldWeight: data.gold_weight || prev.goldWeight,
+            gst: Math.max(0, gst),
+            subtotal: subtotal
+          }));
         }
       } catch (err) {
-        console.error('Failed to calculate price:', err);
+        console.error('Failed to load custom pricing:', err);
       }
     };
-    if (product?._id || product?.id) {
-      fetchCalculatedPrice();
-    }
+
+    fetchCustomPricing();
+
     return () => {
       active = false;
     };
@@ -144,7 +261,6 @@ export default function ProductDetailPage({ product, products: propProducts = []
   // All gallery images: product images only
   const allImages = product.images && product.images.length > 0 ? product.images : [product.image];
 
-  const { addToCart } = useContext(CartContext);
 
   const handleAddToCart = () => {
     addToCart(product, 1, selectedMetal);
@@ -1227,14 +1343,18 @@ export default function ProductDetailPage({ product, products: propProducts = []
           <div className="pdp-sticky-name">{product.name}</div>
           <div className="pdp-sticky-price">₹{currentPrice.toLocaleString('en-IN')}</div>
         </div>
-        <div className="pdp-sticky-sep" />
-        <select
-          className="pdp-sticky-size-sel"
-          value={selectedSize}
-          onChange={e => setSelectedSize(Number(e.target.value))}
-        >
-          {sizeOptions.map(s => <option key={s} value={s}>{s}</option>)}
-        </select>
+        {showSizing && (
+          <>
+            <div className="pdp-sticky-sep" />
+            <select
+              className="pdp-sticky-size-sel"
+              value={selectedSize}
+              onChange={e => setSelectedSize(e.target.value)}
+            >
+              {activeSizes.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </>
+        )}
         <button className="pdp-sticky-add-btn" onClick={handleAddToCart}>
           ADD TO BAG
         </button>
@@ -1321,16 +1441,18 @@ export default function ProductDetailPage({ product, products: propProducts = []
 
           {/* Customise selectors */}
           <div className="pdp-customise-box">
-            <div className="pdp-custom-item">
-              <span className="pdp-custom-label">Size</span>
-              <select
-                className="pdp-custom-select"
-                value={selectedSize}
-                onChange={e => setSelectedSize(Number(e.target.value))}
-              >
-                {sizeOptions.map(s => <option key={s} value={s}>{s}</option>)}
-              </select>
-            </div>
+            {showSizing && (
+              <div className="pdp-custom-item">
+                <span className="pdp-custom-label">Size</span>
+                <select
+                  className="pdp-custom-select"
+                  value={selectedSize}
+                  onChange={e => setSelectedSize(e.target.value)}
+                >
+                  {activeSizes.map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </div>
+            )}
             <div className="pdp-custom-item">
               <span className="pdp-custom-label">Metal</span>
               <select
@@ -1386,11 +1508,13 @@ export default function ProductDetailPage({ product, products: propProducts = []
             </div>
           )}
 
-          {/* Ring size guide */}
-          <div className="pdp-ring-size-row">
-            <span>Not sure about your ring size?</span>
-            <span className="pdp-learn-how-link">LEARN HOW ▶</span>
-          </div>
+          {/* Sizing guide */}
+          {showSizing && (
+            <div className="pdp-ring-size-row">
+              <span>{isRing ? 'Not sure about your ring size?' : 'Not sure about your bangle size?'}</span>
+              <span className="pdp-learn-how-link">LEARN HOW ▶</span>
+            </div>
+          )}
 
           {/* CTA Buttons */}
           <div className="pdp-cta-row">
@@ -1675,8 +1799,10 @@ export default function ProductDetailPage({ product, products: propProducts = []
                 <div className="pdp-related-info">
                   <div className="pdp-related-name">{p.name}</div>
                   <div className="pdp-related-prices">
-                    <span className="pdp-related-price">₹{p.price.toLocaleString('en-IN')}</span>
-                    <span className="pdp-related-old-price">₹{p.originalPrice.toLocaleString('en-IN')}</span>
+                    <span className="pdp-related-price">₹{Number(p.price || 0).toLocaleString('en-IN')}</span>
+                    {Number(p.originalPrice || 0) > Number(p.price || 0) && (
+                      <span className="pdp-related-old-price">₹{Number(p.originalPrice || 0).toLocaleString('en-IN')}</span>
+                    )}
                   </div>
                 </div>
               </div>
