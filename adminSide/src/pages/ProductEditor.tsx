@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import AdminImageUploader from '../components/admin/AdminImageUploader';
-import { 
-  Save, 
+import {
+  Save,
   ArrowLeft,
-  Image as ImageIcon, 
-  Layers, 
-  Coins, 
+  Image as ImageIcon,
+  Layers,
+  Coins,
   Settings,
   Loader2,
   AlertCircle,
@@ -66,7 +66,8 @@ const SUBCATEGORIES = [
   { id: '6', name: 'Stud Earrings' },
   { id: '7', name: 'Hoop Earrings' },
   { id: '8', name: 'Drop Earrings' },
-  { id: '9', name: 'Diamond' }
+  { id: '9', name: 'Diamond' },
+  { id: '10', name: 'colour stone ring' }
 ];
 
 const RING_SIZES = Array.from({ length: 30 }, (_, i) => (i + 1).toString());
@@ -200,7 +201,7 @@ export default function ProductEditor({ productId, onBack, onSaveSuccess }: Prod
         const data = await res.json();
         if (data.success) {
           const product = data.data;
-          
+
           let parsedGallery = {};
           if (product.gallery) {
             if (typeof product.gallery === 'string') {
@@ -369,7 +370,7 @@ export default function ProductEditor({ productId, onBack, onSaveSuccess }: Prod
             if (typeof data.data.gallery === 'string') {
               try {
                 parsedGallery = JSON.parse(data.data.gallery);
-              } catch (e) {}
+              } catch (e) { }
             } else if (typeof data.data.gallery === 'object') {
               parsedGallery = data.data.gallery;
             }
@@ -478,7 +479,7 @@ export default function ProductEditor({ productId, onBack, onSaveSuccess }: Prod
       {/* Top Navigation */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="space-y-2">
-          <a 
+          <a
             href="#"
             onClick={handleBackClick}
             className="flex items-center space-x-2 text-[10px] uppercase tracking-widest text-[#12100e]/70 hover:text-brand-gold transition-colors font-bold mb-4 animate-fade-in"
@@ -492,7 +493,7 @@ export default function ProductEditor({ productId, onBack, onSaveSuccess }: Prod
         </div>
         <div className="flex items-center space-x-4">
           {!isNew && (
-            <a 
+            <a
               href={`/product/${formData.product_slug}`}
               target="_blank"
               rel="noreferrer"
@@ -502,7 +503,7 @@ export default function ProductEditor({ productId, onBack, onSaveSuccess }: Prod
               <span>Preview</span>
             </a>
           )}
-          <button 
+          <button
             onClick={handleSave}
             disabled={saving}
             className="flex items-center space-x-3 px-10 py-4 bg-[#5d463c] hover:bg-[#4c3931] text-[#efe7e5] rounded-2xl font-bold text-[12px] uppercase tracking-[0.3em] transition-all duration-500 shadow-md disabled:opacity-50"
@@ -542,8 +543,8 @@ export default function ProductEditor({ productId, onBack, onSaveSuccess }: Prod
             onClick={() => setActiveTab(tab.id)}
             className={cn(
               'flex items-center space-x-3 px-6 py-3 rounded-2xl transition-all duration-500 text-[11px] font-bold uppercase tracking-widest whitespace-nowrap',
-              activeTab === tab.id 
-                ? 'bg-[#5d463c] text-[#efe7e5] shadow-sm' 
+              activeTab === tab.id
+                ? 'bg-[#5d463c] text-[#efe7e5] shadow-sm'
                 : 'text-[#12100e]/70 hover:text-[#12100e] hover:bg-white/30'
             )}
           >
@@ -560,9 +561,9 @@ export default function ProductEditor({ productId, onBack, onSaveSuccess }: Prod
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
               <div className="space-y-4">
                 <label className="text-[10px] uppercase tracking-[0.3em] font-black text-brand-gold block">Select Category Name*</label>
-                <select 
+                <select
                   value={formData.category_id}
-                  onChange={(e) => setFormData({...formData, category_id: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
                   className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 text-[14px] text-[#12100e] focus:ring-1 focus:ring-brand-gold/50 transition-all shadow-inner"
                 >
                   <option value="">Select Category</option>
@@ -573,9 +574,9 @@ export default function ProductEditor({ productId, onBack, onSaveSuccess }: Prod
               </div>
               <div className="space-y-4">
                 <label className="text-[10px] uppercase tracking-[0.3em] font-black text-brand-gold block">Select Subcategory*</label>
-                <select 
+                <select
                   value={formData.subcategory_id}
-                  onChange={(e) => setFormData({...formData, subcategory_id: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, subcategory_id: e.target.value })}
                   className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 text-[14px] text-[#12100e] focus:ring-1 focus:ring-brand-gold/50 transition-all shadow-inner"
                 >
                   <option value="">Select Subcategory</option>
@@ -586,8 +587,8 @@ export default function ProductEditor({ productId, onBack, onSaveSuccess }: Prod
               </div>
               <div className="space-y-4">
                 <label className="text-[10px] uppercase tracking-[0.3em] font-black text-brand-gold block">Enter Product Title*</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={formData.product_title}
                   onChange={(e) => handleTitleChange(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 text-[14px] text-[#12100e] focus:ring-1 focus:ring-brand-gold/50 transition-all shadow-inner"
@@ -595,36 +596,36 @@ export default function ProductEditor({ productId, onBack, onSaveSuccess }: Prod
               </div>
               <div className="space-y-4">
                 <label className="text-[10px] uppercase tracking-[0.3em] font-black text-brand-gold block">Secure Slug</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={formData.product_slug}
-                  onChange={(e) => setFormData({...formData, product_slug: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, product_slug: e.target.value })}
                   className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 text-[14px] text-[#12100e] focus:ring-1 focus:ring-brand-gold/50 transition-all shadow-inner"
                 />
               </div>
               <div className="space-y-4">
                 <label className="text-[10px] uppercase tracking-[0.3em] font-black text-brand-gold block">Enter Product Code*</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={formData.product_code}
-                  onChange={(e) => setFormData({...formData, product_code: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, product_code: e.target.value })}
                   className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 text-[14px] text-[#12100e] focus:ring-1 focus:ring-brand-gold/50 transition-all shadow-inner"
                 />
               </div>
               <div className="space-y-4">
                 <label className="text-[10px] uppercase tracking-[0.3em] font-black text-brand-gold block">Enter Product HSN Code*</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={formData.hsn_code}
-                  onChange={(e) => setFormData({...formData, hsn_code: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, hsn_code: e.target.value })}
                   className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 text-[14px] text-[#12100e] focus:ring-1 focus:ring-brand-gold/50 transition-all shadow-inner"
                 />
               </div>
               <div className="space-y-4">
                 <label className="text-[10px] uppercase tracking-[0.3em] font-black text-brand-gold block">Product Type*</label>
-                <select 
+                <select
                   value={formData.product_type}
-                  onChange={(e) => setFormData({...formData, product_type: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, product_type: e.target.value })}
                   className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 text-[14px] text-[#12100e] focus:ring-1 focus:ring-brand-gold/50 transition-all shadow-inner"
                 >
                   <option value="diamond">Diamond Jewelry</option>
@@ -635,9 +636,9 @@ export default function ProductEditor({ productId, onBack, onSaveSuccess }: Prod
               </div>
               <div className="space-y-4">
                 <label className="text-[10px] uppercase tracking-[0.3em] font-black text-brand-gold block">Select Gender*</label>
-                <select 
+                <select
                   value={formData.gender}
-                  onChange={(e) => setFormData({...formData, gender: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
                   className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 text-[14px] text-[#12100e] focus:ring-1 focus:ring-brand-gold/50 transition-all shadow-inner"
                 >
                   {GENDERS.map(g => (
@@ -647,19 +648,19 @@ export default function ProductEditor({ productId, onBack, onSaveSuccess }: Prod
               </div>
               <div className="space-y-4">
                 <label className="text-[10px] uppercase tracking-[0.3em] font-black text-brand-gold block">Custom Type</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={formData.custom_type}
-                  onChange={(e) => setFormData({...formData, custom_type: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, custom_type: e.target.value })}
                   className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 text-[14px] text-[#12100e] focus:ring-1 focus:ring-brand-gold/50 transition-all shadow-inner"
                 />
               </div>
               <div className="space-y-4">
                 <label className="text-[10px] uppercase tracking-[0.3em] font-black text-brand-gold block">Visibility</label>
                 <div className="flex items-center space-x-6 h-15">
-                  <button 
+                  <button
                     type="button"
-                    onClick={() => setFormData({...formData, status: '1'})}
+                    onClick={() => setFormData({ ...formData, status: '1' })}
                     className={cn(
                       'flex-1 flex items-center justify-center space-x-3 px-6 py-3 rounded-xl border transition-all duration-500',
                       formData.status === '1' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-700 font-bold' : 'bg-white border-slate-200 text-[#12100e]/30'
@@ -668,9 +669,9 @@ export default function ProductEditor({ productId, onBack, onSaveSuccess }: Prod
                     <Eye size={16} />
                     <span className="text-[11px] font-bold uppercase tracking-widest">Live</span>
                   </button>
-                  <button 
+                  <button
                     type="button"
-                    onClick={() => setFormData({...formData, status: '0'})}
+                    onClick={() => setFormData({ ...formData, status: '0' })}
                     className={cn(
                       'flex-1 flex items-center justify-center space-x-3 px-6 py-3 rounded-xl border transition-all duration-500',
                       formData.status === '0' ? 'bg-red-500/10 border-red-500/30 text-red-600 font-bold' : 'bg-white border-slate-200 text-[#12100e]/30'
@@ -681,14 +682,14 @@ export default function ProductEditor({ productId, onBack, onSaveSuccess }: Prod
                   </button>
                 </div>
               </div>
- 
+
               {/* Marketing Toggles */}
               <div className="space-y-4 col-span-1 md:col-span-2 grid grid-cols-3 gap-6 pt-4 border-t border-slate-200/80">
                 <div className="space-y-2">
                   <label className="text-[9px] uppercase tracking-[0.3em] font-black text-brand-gold block">Featured product</label>
-                  <select 
+                  <select
                     value={formData.feature}
-                    onChange={(e) => setFormData({...formData, feature: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, feature: e.target.value })}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-[12px] text-[#12100e]"
                   >
                     <option value="0">Standard</option>
@@ -697,9 +698,9 @@ export default function ProductEditor({ productId, onBack, onSaveSuccess }: Prod
                 </div>
                 <div className="space-y-2">
                   <label className="text-[9px] uppercase tracking-[0.3em] font-black text-brand-gold block">Top Selling</label>
-                  <select 
+                  <select
                     value={formData.topselling}
-                    onChange={(e) => setFormData({...formData, topselling: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, topselling: e.target.value })}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-[12px] text-[#12100e]"
                   >
                     <option value="0">Standard</option>
@@ -708,9 +709,9 @@ export default function ProductEditor({ productId, onBack, onSaveSuccess }: Prod
                 </div>
                 <div className="space-y-2">
                   <label className="text-[9px] uppercase tracking-[0.3em] font-black text-brand-gold block">Sessional Collection</label>
-                  <select 
+                  <select
                     value={formData.sessional}
-                    onChange={(e) => setFormData({...formData, sessional: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, sessional: e.target.value })}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-[12px] text-[#12100e]"
                   >
                     <option value="0">Standard</option>
@@ -719,13 +720,13 @@ export default function ProductEditor({ productId, onBack, onSaveSuccess }: Prod
                 </div>
               </div>
             </div>
- 
+
             <div className="space-y-4">
               <label className="text-[10px] uppercase tracking-[0.3em] font-black text-brand-gold block">Enter Product Description*</label>
-              <textarea 
+              <textarea
                 rows={6}
                 value={formData.description}
-                onChange={(e) => setFormData({...formData, description: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 className="w-full bg-slate-50 border border-slate-200 rounded-4xl py-6 px-8 text-[14px] leading-relaxed text-[#12100e] focus:ring-1 focus:ring-brand-gold/50 transition-all shadow-inner"
               />
             </div>
@@ -737,49 +738,49 @@ export default function ProductEditor({ productId, onBack, onSaveSuccess }: Prod
             <div className="grid grid-cols-1 md:grid-cols-5 gap-10">
               <div className="space-y-4">
                 <label className="text-[10px] uppercase tracking-[0.3em] font-black text-brand-gold block">Price (₹)</label>
-                <input 
-                  type="number" 
+                <input
+                  type="number"
                   value={formData.price || ''}
-                  onChange={(e) => setFormData({...formData, price: parseFloat(e.target.value) || 0})}
+                  onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })}
                   className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 text-[14px] font-bold text-brand-gold transition-all shadow-inner"
                 />
               </div>
               <div className="space-y-4">
                 <label className="text-[10px] uppercase tracking-[0.3em] font-black text-brand-gold block">Discount (%)</label>
-                <input 
-                  type="number" 
+                <input
+                  type="number"
                   value={formData.discount || ''}
-                  onChange={(e) => setFormData({...formData, discount: parseFloat(e.target.value) || 0})}
+                  onChange={(e) => setFormData({ ...formData, discount: parseFloat(e.target.value) || 0 })}
                   className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 text-[14px] font-bold text-[#12100e] transition-all shadow-inner"
                 />
               </div>
               <div className="space-y-4">
                 <label className="text-[10px] uppercase tracking-[0.3em] font-black text-brand-gold block">Stock Count</label>
-                <input 
-                  type="number" 
+                <input
+                  type="number"
                   value={formData.stock || ''}
-                  onChange={(e) => setFormData({...formData, stock: parseInt(e.target.value) || 0})}
+                  onChange={(e) => setFormData({ ...formData, stock: parseInt(e.target.value) || 0 })}
                   className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 text-[14px] font-bold text-[#12100e] transition-all shadow-inner"
                 />
               </div>
               <div className="space-y-4">
                 <label className="text-[10px] uppercase tracking-[0.3em] font-black text-brand-gold block">Base Product Weight (g)</label>
-                <input 
-                  type="number" 
+                <input
+                  type="number"
                   step="0.01"
                   value={formData.product_weight || ''}
-                  onChange={(e) => setFormData({...formData, product_weight: parseFloat(e.target.value) || 0})}
+                  onChange={(e) => setFormData({ ...formData, product_weight: parseFloat(e.target.value) || 0 })}
                   className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 text-[14px] font-bold text-[#12100e] transition-all shadow-inner"
                 />
               </div>
               <div className="space-y-4">
                 <label className="text-[10px] uppercase tracking-[0.3em] font-black text-brand-gold block">Making Charges (₹)</label>
-                <input 
-                  type="number" 
+                <input
+                  type="number"
                   value={formData.making_charges || ''}
                   onChange={(e) => {
                     const val = parseFloat(e.target.value) || 0;
-                    setFormData({...formData, making_charges: val, makingCharges: val});
+                    setFormData({ ...formData, making_charges: val, makingCharges: val });
                   }}
                   className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 text-[14px] font-bold text-[#12100e] transition-all shadow-inner"
                 />
@@ -834,12 +835,12 @@ export default function ProductEditor({ productId, onBack, onSaveSuccess }: Prod
           <div className="bg-white border border-slate-200/80 rounded-[40px] p-10 space-y-12 shadow-sm">
             <div className="space-y-6">
               <label className="text-[10px] uppercase tracking-[0.3em] font-black text-brand-gold block">Jewellery Weights & Specifications</label>
-              
+
               {/* Dynamic Feature Inclusion Toggles */}
               <div className="bg-[#5d463c]/5 border border-[#5d463c]/15 rounded-3xl p-6 flex flex-wrap gap-8 justify-around">
                 <label className="flex items-center space-x-3 cursor-pointer select-none">
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     checked={includeDiamond}
                     onChange={(e) => setIncludeDiamond(e.target.checked)}
                     className="w-5 h-5 accent-[#5d463c] rounded"
@@ -848,8 +849,8 @@ export default function ProductEditor({ productId, onBack, onSaveSuccess }: Prod
                 </label>
 
                 <label className="flex items-center space-x-3 cursor-pointer select-none">
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     checked={includeSolitaire}
                     onChange={(e) => setIncludeSolitaire(e.target.checked)}
                     className="w-5 h-5 accent-[#5d463c] rounded"
@@ -858,8 +859,8 @@ export default function ProductEditor({ productId, onBack, onSaveSuccess }: Prod
                 </label>
 
                 <label className="flex items-center space-x-3 cursor-pointer select-none">
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     checked={includeGemstone}
                     onChange={(e) => setIncludeGemstone(e.target.checked)}
                     className="w-5 h-5 accent-[#5d463c] rounded"
@@ -872,41 +873,41 @@ export default function ProductEditor({ productId, onBack, onSaveSuccess }: Prod
                 {/* Core Specifications */}
                 <div className="space-y-3">
                   <label className="text-[9px] uppercase tracking-[0.3em] font-black text-brand-gold ml-2 block">Product Weight *</label>
-                  <input 
-                    type="number" 
+                  <input
+                    type="number"
                     step="0.01"
                     value={formData.product_weight || ''}
-                    onChange={(e) => setFormData({...formData, product_weight: parseFloat(e.target.value) || 0})}
+                    onChange={(e) => setFormData({ ...formData, product_weight: parseFloat(e.target.value) || 0 })}
                     className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 px-6 text-[13px] text-[#12100e]"
                   />
                 </div>
                 <div className="space-y-3">
                   <label className="text-[9px] uppercase tracking-[0.3em] font-black text-brand-gold ml-2 block">Gold Weight (14k) *</label>
-                  <input 
-                    type="number" 
+                  <input
+                    type="number"
                     step="0.01"
                     value={formData.gold_weight || ''}
-                    onChange={(e) => setFormData({...formData, gold_weight: parseFloat(e.target.value) || 0})}
+                    onChange={(e) => setFormData({ ...formData, gold_weight: parseFloat(e.target.value) || 0 })}
                     className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 px-6 text-[13px] text-[#12100e]"
                   />
                 </div>
                 <div className="space-y-3">
                   <label className="text-[9px] uppercase tracking-[0.3em] font-black text-brand-gold ml-2 block">Height (mm) *</label>
-                  <input 
-                    type="number" 
+                  <input
+                    type="number"
                     step="0.01"
                     value={formData.height || ''}
-                    onChange={(e) => setFormData({...formData, height: parseFloat(e.target.value) || 0})}
+                    onChange={(e) => setFormData({ ...formData, height: parseFloat(e.target.value) || 0 })}
                     className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 px-6 text-[13px] text-[#12100e]"
                   />
                 </div>
                 <div className="space-y-3">
                   <label className="text-[9px] uppercase tracking-[0.3em] font-black text-brand-gold ml-2 block">Width (mm) *</label>
-                  <input 
-                    type="number" 
+                  <input
+                    type="number"
                     step="0.01"
                     value={formData.width || ''}
-                    onChange={(e) => setFormData({...formData, width: parseFloat(e.target.value) || 0})}
+                    onChange={(e) => setFormData({ ...formData, width: parseFloat(e.target.value) || 0 })}
                     className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 px-6 text-[13px] text-[#12100e]"
                   />
                 </div>
@@ -918,20 +919,20 @@ export default function ProductEditor({ productId, onBack, onSaveSuccess }: Prod
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                       <div className="space-y-3">
                         <label className="text-[9px] uppercase tracking-[0.3em] font-black text-brand-gold ml-2 block">Diamond Weight *</label>
-                        <input 
-                          type="number" 
+                        <input
+                          type="number"
                           step="0.01"
                           value={formData.diamond_weight || ''}
-                          onChange={(e) => setFormData({...formData, diamond_weight: parseFloat(e.target.value) || 0})}
+                          onChange={(e) => setFormData({ ...formData, diamond_weight: parseFloat(e.target.value) || 0 })}
                           className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 px-6 text-[13px] text-[#12100e]"
                         />
                       </div>
                       <div className="space-y-3">
                         <label className="text-[9px] uppercase tracking-[0.3em] font-black text-brand-gold ml-2 block">Diamond Count *</label>
-                        <input 
-                          type="number" 
+                        <input
+                          type="number"
                           value={formData.diamond_count || ''}
-                          onChange={(e) => setFormData({...formData, diamond_count: parseInt(e.target.value) || 0})}
+                          onChange={(e) => setFormData({ ...formData, diamond_count: parseInt(e.target.value) || 0 })}
                           className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 px-6 text-[13px] text-[#12100e]"
                         />
                       </div>
@@ -946,19 +947,19 @@ export default function ProductEditor({ productId, onBack, onSaveSuccess }: Prod
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                       <div className="space-y-3">
                         <label className="text-[9px] uppercase tracking-[0.3em] font-black text-brand-gold ml-2 block">Solitaire Price (₹)</label>
-                        <input 
-                          type="number" 
+                        <input
+                          type="number"
                           value={formData.solitaires_price || ''}
-                          onChange={(e) => setFormData({...formData, solitaires_price: parseFloat(e.target.value) || 0})}
+                          onChange={(e) => setFormData({ ...formData, solitaires_price: parseFloat(e.target.value) || 0 })}
                           className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 px-6 text-[13px] text-[#12100e]"
                         />
                       </div>
                       <div className="space-y-3">
                         <label className="text-[9px] uppercase tracking-[0.3em] font-black text-brand-gold ml-2 block">Solitaire Quality</label>
-                        <input 
-                          type="text" 
+                        <input
+                          type="text"
                           value={formData.solitaires_quality}
-                          onChange={(e) => setFormData({...formData, solitaires_quality: e.target.value})}
+                          onChange={(e) => setFormData({ ...formData, solitaires_quality: e.target.value })}
                           placeholder="e.g. VVS1-F"
                           className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 px-6 text-[13px] text-[#12100e]"
                         />
@@ -974,30 +975,30 @@ export default function ProductEditor({ productId, onBack, onSaveSuccess }: Prod
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                       <div className="space-y-3">
                         <label className="text-[9px] uppercase tracking-[0.3em] font-black text-brand-gold ml-2 block">Color Stone Info</label>
-                        <input 
-                          type="text" 
+                        <input
+                          type="text"
                           value={formData.color_stone ?? ''}
-                          onChange={(e) => setFormData({...formData, color_stone: e.target.value || null})}
+                          onChange={(e) => setFormData({ ...formData, color_stone: e.target.value || null })}
                           placeholder="e.g. Ruby, Emerald"
                           className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 px-6 text-[13px] text-[#12100e]"
                         />
                       </div>
                       <div className="space-y-3">
                         <label className="text-[9px] uppercase tracking-[0.3em] font-black text-brand-gold ml-2 block">Gemstone Weight (ct)</label>
-                        <input 
-                          type="number" 
+                        <input
+                          type="number"
                           step="0.01"
                           value={formData.gemstone_weight || ''}
-                          onChange={(e) => setFormData({...formData, gemstone_weight: parseFloat(e.target.value) || 0})}
+                          onChange={(e) => setFormData({ ...formData, gemstone_weight: parseFloat(e.target.value) || 0 })}
                           className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 px-6 text-[13px] text-[#12100e]"
                         />
                       </div>
                       <div className="space-y-3">
                         <label className="text-[9px] uppercase tracking-[0.3em] font-black text-brand-gold ml-2 block">Total Number Of GEM *</label>
-                        <input 
-                          type="number" 
+                        <input
+                          type="number"
                           value={formData.noof_gem || ''}
-                          onChange={(e) => setFormData({...formData, noof_gem: parseInt(e.target.value) || 0})}
+                          onChange={(e) => setFormData({ ...formData, noof_gem: parseInt(e.target.value) || 0 })}
                           className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 px-6 text-[13px] text-[#12100e]"
                         />
                       </div>
@@ -1017,7 +1018,7 @@ export default function ProductEditor({ productId, onBack, onSaveSuccess }: Prod
                           onClick={() => handleKaratToggle(karat.id)}
                           className={cn(
                             'flex items-center justify-center px-6 py-3 rounded-xl border text-center transition-all duration-300 cursor-pointer text-[12px] font-bold uppercase tracking-wider',
-                            isChecked 
+                            isChecked
                               ? 'bg-[#5d463c] text-[#efe7e5] border-[#5d463c]'
                               : 'bg-slate-50 border border-slate-200 text-[#12100e]/60'
                           )}
@@ -1035,16 +1036,16 @@ export default function ProductEditor({ productId, onBack, onSaveSuccess }: Prod
 
         {activeTab === 'attributes' && (
           <div className="bg-white border border-slate-200/80 rounded-[40px] p-10 space-y-12 shadow-sm">
-            
+
             {/* Category Configuration */}
             <div className="space-y-6">
               <h3 className="text-lg font-serif font-bold text-[#12100e]">Collection Category</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-3">
                   <label className="text-[9px] uppercase tracking-[0.3em] font-black text-brand-gold ml-2 block">Category</label>
-                  <select 
+                  <select
                     value={formData.category_id}
-                    onChange={(e) => setFormData({...formData, category_id: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
                     className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 text-[14px] text-[#12100e]"
                   >
                     <option value="">Select Category</option>
@@ -1055,9 +1056,9 @@ export default function ProductEditor({ productId, onBack, onSaveSuccess }: Prod
                 </div>
                 <div className="space-y-3">
                   <label className="text-[9px] uppercase tracking-[0.3em] font-black text-brand-gold ml-2 block">Subcategory</label>
-                  <select 
+                  <select
                     value={formData.subcategory_id}
-                    onChange={(e) => setFormData({...formData, subcategory_id: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, subcategory_id: e.target.value })}
                     className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 text-[14px] text-[#12100e]"
                   >
                     <option value="">Select Subcategory</option>
@@ -1084,7 +1085,7 @@ export default function ProductEditor({ productId, onBack, onSaveSuccess }: Prod
                       onClick={() => handleMetalToggle(metal.id)}
                       className={cn(
                         'flex items-center justify-center p-4 rounded-2xl border text-center transition-all duration-300 cursor-pointer',
-                        isChecked 
+                        isChecked
                           ? 'bg-[#5d463c]/15 border-[#5d463c] text-[#5d463c] font-bold'
                           : 'bg-slate-50 border border-slate-200 text-[#12100e]/60'
                       )}
@@ -1108,7 +1109,7 @@ export default function ProductEditor({ productId, onBack, onSaveSuccess }: Prod
                       onClick={() => handleKaratToggle(karat.id)}
                       className={cn(
                         'flex items-center justify-center p-4 rounded-2xl border text-center transition-all duration-300 cursor-pointer',
-                        isChecked 
+                        isChecked
                           ? 'bg-[#5d463c]/15 border-[#5d463c] text-[#5d463c] font-bold'
                           : 'bg-slate-50 border border-slate-200 text-[#12100e]/60'
                       )}
@@ -1132,7 +1133,7 @@ export default function ProductEditor({ productId, onBack, onSaveSuccess }: Prod
                       onClick={() => handleDiamondQualityToggle(dq.id)}
                       className={cn(
                         'flex items-center justify-center p-4 rounded-2xl border text-center transition-all duration-300 cursor-pointer',
-                        isChecked 
+                        isChecked
                           ? 'bg-[#5d463c]/15 border-[#5d463c] text-[#5d463c] font-bold'
                           : 'bg-slate-50 border border-slate-200 text-[#12100e]/60'
                       )}
@@ -1149,9 +1150,9 @@ export default function ProductEditor({ productId, onBack, onSaveSuccess }: Prod
               const isRing = formData.category_id === '1';
               const isBangleOrBracelet = formData.category_id === '4' || formData.category_id === '5';
               const showSizing = isRing || isBangleOrBracelet;
-              
+
               if (!showSizing) return null;
-              
+
               return (
                 <div className="space-y-6 pt-10 border-t border-slate-200/80">
                   <div className="flex items-center justify-between">
@@ -1172,7 +1173,7 @@ export default function ProductEditor({ productId, onBack, onSaveSuccess }: Prod
                           onClick={() => handleSizeToggle(sz)}
                           className={cn(
                             'flex items-center justify-center py-3 rounded-xl border text-center transition-all duration-205 text-[11px] font-bold cursor-pointer',
-                            isChecked 
+                            isChecked
                               ? 'bg-[#5d463c] text-[#efe7e5] border-[#5d463c]'
                               : 'bg-slate-50 border border-slate-200 text-[#12100e]/50 hover:border-[#5d463c]/30'
                           )}
